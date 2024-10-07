@@ -16,7 +16,7 @@ namespace Presentation.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateVacancy(Guid id, [FromBody] VacancyDto updateVacancyDto)
+        public async Task<IActionResult> UpdateVacancy([FromBody] VacancyDto updateVacancyDto)
         {
             var vacancy = await vacancyService.UpdateVacancyAsync(updateVacancyDto);
             return Ok(vacancy);

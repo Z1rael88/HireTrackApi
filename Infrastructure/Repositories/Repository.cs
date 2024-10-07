@@ -1,3 +1,4 @@
+using Domain.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces;

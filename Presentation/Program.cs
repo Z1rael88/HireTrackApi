@@ -1,12 +1,16 @@
 using Application.Interfaces;
 using Application.Mappers;
 using Application.Services;
+using Domain.Models;
 using Infrastructure.Data;
 using Infrastructure.Interfaces;
 using Infrastructure.Repositories;
 using Mapster;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Presentation.Extensions;
+using Presentation.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +18,21 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMapster();
 MapsterConfig.VacancyMappings();
+
+builder.Services.AddSwaggerWithJwtAuthentication();
+builder.Services.AddAuthenticationWithJwtTokenSettings(builder.Configuration);
+builder.Services.AddIdentityCore<User>(
+        options =>
+        {
+            var passwordSettings = builder.Configuration.GetSection("PasswordValidation");
+
+            options.Password.RequiredUniqueChars = passwordSettings.GetValue<int>("RequiredUniqueChars");
+            options.Password.RequireUppercase = passwordSettings.GetValue<bool>("RequireUppercase");
+            options.Password.RequiredLength = passwordSettings.GetValue<int>("RequiredLength");
+        })
+    .AddRoles<IdentityRole<Guid>>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IVacancyService, VacancyService>();
@@ -58,6 +77,15 @@ builder.Services.AddSwaggerGen(config =>
     });
 });
 builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", builder =>
+    {
+        builder.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -66,6 +94,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapControllers();
+app.UseCors("AllowReactApp");
 app.UseHttpsRedirection();
+app.UseMiddleware<GlobalExceptionHandler>();
+app.MapControllers();
 app.Run();
