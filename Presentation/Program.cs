@@ -1,7 +1,11 @@
+using Application.Dtos;
+using Application.Dtos.User;
 using Application.Interfaces;
 using Application.Mappers;
 using Application.Services;
+using Application.Validators;
 using Domain.Models;
+using FluentValidation;
 using Infrastructure.Data;
 using Infrastructure.Interfaces;
 using Infrastructure.Repositories;
@@ -19,16 +23,17 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddMapster();
 MapsterConfig.VacancyMappings();
 
+builder.Services.AddScoped<IValidator<BaseUserDto>, UserValidator>();
+builder.Services.AddScoped<IValidator<VacancyDto>, VacancyValidator>();
+
 builder.Services.AddSwaggerWithJwtAuthentication();
 builder.Services.AddAuthenticationWithJwtTokenSettings(builder.Configuration);
 builder.Services.AddIdentityCore<User>(
         options =>
         {
-            var passwordSettings = builder.Configuration.GetSection("PasswordValidation");
-
-            options.Password.RequiredUniqueChars = passwordSettings.GetValue<int>("RequiredUniqueChars");
-            options.Password.RequireUppercase = passwordSettings.GetValue<bool>("RequireUppercase");
-            options.Password.RequiredLength = passwordSettings.GetValue<int>("RequiredLength");
+            options.Password.RequiredUniqueChars = 2;
+            options.Password.RequireUppercase = true;
+            options.Password.RequiredLength = 10;
         })
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()

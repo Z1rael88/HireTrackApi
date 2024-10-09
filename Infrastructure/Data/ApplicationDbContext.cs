@@ -1,4 +1,5 @@
 using Domain.Models;
+using Infrastructure.Data.Configurations;
 using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -20,15 +21,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        //  ApplyConfigurations(modelBuilder);
+        ApplyConfigurations(modelBuilder);
     }
 
     private void ApplyConfigurations(ModelBuilder modelBuilder)
     {
-        //var addressValidationOptions = this.GetService<IOptions<AddressValidationOptions>>().Value;
-
-        /*  modelBuilder
-              .ApplyConfiguration(new AddressConfiguration(addressValidationOptions))
-              */
+        modelBuilder.ApplyConfiguration(new VacancyConfiguration());
+        modelBuilder.ApplyConfiguration(new UserConfiguration());
     }
 }
