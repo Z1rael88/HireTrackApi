@@ -13,6 +13,7 @@ public interface IApplicationDbContext
     DbSet<Technology> Technologies { get; }
     DbSet<TechnologyType> TechnologyTypes { get; }
     DbSet<JobExperience> JobExperiences { get; }
+    DbSet<Company> Companies { get; }
 
 
     Task<int> SaveChangesAsync();

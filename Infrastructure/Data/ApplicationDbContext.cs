@@ -19,6 +19,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Technology> Technologies { get; }
     public DbSet<TechnologyType> TechnologyTypes { get; }
     public DbSet<JobExperience> JobExperiences { get; }
+    public DbSet<Company> Companies { get; }
 
     public async Task<int> SaveChangesAsync()
     {
@@ -42,5 +43,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.ApplyConfiguration(new TechnologyTypeConfiguration());
         modelBuilder.ApplyConfiguration(new EducationConfiguration());
         modelBuilder.ApplyConfiguration(new JobExperienceConfiguration());
+        modelBuilder.ApplyConfiguration(new CompanyConfiguration());
     }
 }

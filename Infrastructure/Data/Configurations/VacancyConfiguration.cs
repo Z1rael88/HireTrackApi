@@ -24,8 +24,12 @@ public class VacancyConfiguration
             .IsRequired();
         builder.Property(a => a.Salary)
             .IsRequired();
+        builder.Property(x => x.CompanyName).IsRequired();
         builder.HasOne(x=>x.Hr)
             .WithMany()
             .HasForeignKey(x=>x.HrId);
+        builder.HasOne(x => x.Company)
+            .WithMany()
+            .HasForeignKey(x => x.CompanyId);
     }
 }
