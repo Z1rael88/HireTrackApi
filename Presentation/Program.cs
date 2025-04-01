@@ -35,7 +35,7 @@ builder.Services.AddIdentityCore<User>(
             options.Password.RequireUppercase = true;
             options.Password.RequiredLength = 10;
         })
-    .AddRoles<IdentityRole<Guid>>()
+    .AddRoles<IdentityRole<int>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 

@@ -6,7 +6,7 @@ public interface IVacancyService
 {
     Task<VacancyDto> CreateVacancyAsync(VacancyDto createVacancyDto);
     Task<VacancyDto> UpdateVacancyAsync(VacancyDto updateVacancyDto);
-    Task<VacancyDto> GetVacancyByIdAsync(Guid vacancyId);
+    Task<VacancyDto> GetVacancyByIdAsync(int vacancyId);
     Task<IEnumerable<VacancyDto>> GetVacanciesAsync();
-    Task DeleteVacancyAsync(Guid vacancyId);
+    Task DeleteVacancyAsync(int vacancyId);
 }

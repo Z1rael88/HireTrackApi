@@ -10,7 +10,6 @@ namespace Infrastructure.Data.Configurations
         public virtual void Configure(EntityTypeBuilder<T> builder)
         {
             builder.HasKey(entity => entity.Id);
-            builder.Property(entity => entity.IsDeleted).IsRequired();
         }
     }
 }

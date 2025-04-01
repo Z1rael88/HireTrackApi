@@ -27,7 +27,7 @@ public class VacancyService(IUnitOfWork unitOfWork, IValidator<VacancyDto> valid
         return createdVacancy.Adapt<VacancyDto>();
     }
 
-    public async Task<VacancyDto> GetVacancyByIdAsync(Guid vacancyId)
+    public async Task<VacancyDto> GetVacancyByIdAsync(int vacancyId)
     {
         var vacancy = await _repository.GetByIdAsync(vacancyId);
         return vacancy.Adapt<VacancyDto>();
@@ -39,7 +39,7 @@ public class VacancyService(IUnitOfWork unitOfWork, IValidator<VacancyDto> valid
         return vacancies.Adapt<IEnumerable<VacancyDto>>();
     }
 
-    public async Task DeleteVacancyAsync(Guid vacancyId)
+    public async Task DeleteVacancyAsync(int vacancyId)
     {
         await _repository.DeleteAsync(vacancyId);
     }

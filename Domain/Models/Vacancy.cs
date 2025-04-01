@@ -7,4 +7,6 @@ public class Vacancy : BaseEntity
     public decimal Salary { get; set; }
     public DateOnly AddDate { get; set; }
     public DateOnly EndDate { get; set; }
+    public User Hr { get; set; }
+    public int HrId { get; set; }
 }

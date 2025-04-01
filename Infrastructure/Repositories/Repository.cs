@@ -28,14 +28,13 @@ namespace Infrastructure.Repositories
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
-            IQueryable<T> query = Entities.Where(x => !x.IsDeleted);
+            IQueryable<T> query = Entities;
             return await query.ToListAsync();
         }
 
-        public async Task<T> GetByIdAsync(Guid id)
+        public async Task<T> GetByIdAsync(int id)
         {
-            T? entity = await Entities
-                .Where(x => x.Id == id && !x.IsDeleted)
+            var entity = await Entities
                 .FirstOrDefaultAsync();
             if (entity == null)
             {
@@ -45,7 +44,7 @@ namespace Infrastructure.Repositories
             return entity;
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(int id)
         {
             var entity = await GetByIdAsync(id);
             if (entity == null)
@@ -53,7 +52,6 @@ namespace Infrastructure.Repositories
                 throw new ArgumentException();
             }
 
-            entity.IsDeleted = true;
             await UpdateAsync(entity);
         }
     }

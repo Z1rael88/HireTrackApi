@@ -23,7 +23,7 @@ namespace Presentation.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetVacancyById(Guid id)
+        public async Task<IActionResult> GetVacancyById(int id)
         {
             var vacancy = await vacancyService.GetVacancyByIdAsync(id);
             return Ok(vacancy);
@@ -37,7 +37,7 @@ namespace Presentation.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteVacancy(Guid id)
+        public async Task<IActionResult> DeleteVacancy(int id)
         {
             await vacancyService.DeleteVacancyAsync(id);
             return NoContent();
