@@ -25,6 +25,7 @@ namespace Infrastructure.Data.Configurations
                 .HasMaxLength(25);
             builder.Property(x => x.Age)
                 .IsRequired();
+            builder.Property(x => x.CompanyId);
         }
     }
 }

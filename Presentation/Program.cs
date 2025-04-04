@@ -1,5 +1,6 @@
 using Application.Dtos;
 using Application.Dtos.User;
+using Application.Initializers;
 using Application.Interfaces;
 using Application.Mappers;
 using Application.Services;
@@ -9,19 +10,20 @@ using FluentValidation;
 using Infrastructure.Data;
 using Infrastructure.Interfaces;
 using Infrastructure.Repositories;
+using Infrastructure.ValidationOptions;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using Presentation.Extensions;
 using Presentation.Middlewares;
+using Presentation.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddMapster();
 MapsterConfig.VacancyMappings();
+MapsterConfig.UserMappings();
 
 builder.Services.AddScoped<IValidator<BaseUserDto>, UserValidator>();
 builder.Services.AddScoped<IValidator<VacancyDto>, VacancyValidator>();
@@ -40,47 +42,17 @@ builder.Services.AddIdentityCore<User>(
     .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUser, CurrentUserService>();
 builder.Services.AddScoped<IVacancyService, VacancyService>();
+builder.Services.AddSingleton<IHttpContextAccessor,HttpContextAccessor>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+builder.Services.AddScoped<GlobalExceptionHandler>();
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(config =>
-{
-    config.MapType<DateOnly>(() => new OpenApiSchema { Type = "string", Format = "date" });
-
-    config.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "My API",
-        Version = "v1",
-    });
-
-    config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Please enter the JWT token",
-    });
-
-    config.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer",
-                },
-            },
-            Array.Empty<string>()
-        },
-    });
-});
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddCors(options =>
 {
@@ -98,7 +70,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+await RolesInitializer.InitializeRolesAsync(app.Services);
+await SystemAdministratorInitializer.InitializeSystemAdministratorAsync(app.Services, builder.Configuration);
 app.UseCors("AllowReactApp");
 app.UseHttpsRedirection();
 app.UseMiddleware<GlobalExceptionHandler>();

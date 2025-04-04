@@ -1,10 +1,13 @@
 using Application.Dtos;
 using Application.Interfaces;
+using Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers
 {
-    [Route("api/[controller]")]
+   // [Authorize(Roles = $"{nameof(Role.HrManager)},{nameof(Role.CompanyAdministrator)}")]
+    [Route("api/vacancies")]
     [ApiController]
     public class VacancyController(IVacancyService vacancyService) : ControllerBase
     {
