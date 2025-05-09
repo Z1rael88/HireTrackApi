@@ -2,36 +2,46 @@ using Domain.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Interfaces;
 
-namespace Infrastructure.Repositories;
-
-public class UnitOfWork(ApplicationDbContext dbContext) : IUnitOfWork
+namespace Infrastructure.Repositories
 {
-    private bool _disposed;
+    public sealed class UnitOfWork(ApplicationDbContext dbContext) : IUnitOfWork, IDisposable
+    {
+        private readonly ApplicationDbContext _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+        private bool _disposed;
+        private IVacancyRepository _vacancyRepository;
+        private IResumeRepository _resumeRepository;
 
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
 
-    public IRepository<T> Repository<T>() where T : class, IBaseEntity
-    {
-        return new Repository<T>(dbContext);
-    }
-
-    public async Task SaveChangesAsync()
-    {
-        await dbContext.SaveChangesAsync();
-    }
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposed)
+        public IRepository<T> Repository<T>() where T : class, IBaseEntity
         {
-            if (disposing)
-            {
-                dbContext.Dispose();
-            }
+            return new Repository<T>(_dbContext); 
         }
-        _disposed = true;
+
+        public IVacancyRepository Vacancies => _vacancyRepository ??= new VacancyRepository(_dbContext);
+        public IResumeRepository Resumes => _resumeRepository ??= new ResumeRepository(_dbContext);
+
+
+        public async Task SaveChangesAsync()
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _dbContext.Dispose(); 
+                }
+            }
+            _disposed = true;
+        }
     }
 }

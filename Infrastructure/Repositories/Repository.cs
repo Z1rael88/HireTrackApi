@@ -19,6 +19,10 @@ namespace Infrastructure.Repositories
             await DbContext.SaveChangesAsync();
             return newEntity.Entity;
         }
+        public IQueryable<T> Query()
+        {
+            return dbContext.Set<T>().AsQueryable();
+        }
 
         public async Task<T> UpdateAsync(T entity)
         {

@@ -12,4 +12,5 @@ public class Vacancy : BaseEntity
     public int HrId { get; set; }
     public Company Company { get; set; }
     public int CompanyId { get; set; }
+    public ICollection<VacancyResume> VacancyResumes { get; set; }
 }

@@ -1,5 +1,6 @@
 using Application.Dtos;
 using Application.Dtos.User;
+using Application.Dtos.Vacancy;
 using Application.Initializers;
 using Application.Interfaces;
 using Application.Mappers;
@@ -24,10 +25,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddMapster();
 MapsterConfig.VacancyMappings();
 MapsterConfig.UserMappings();
+MapsterConfig.ResumeMappings();
 
-builder.Services.AddScoped<IValidator<BaseUserDto>, UserValidator>();
-builder.Services.AddScoped<IValidator<VacancyDto>, VacancyValidator>();
-
+builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
 builder.Services.AddSwaggerWithJwtAuthentication();
 builder.Services.AddAuthenticationWithJwtTokenSettings(builder.Configuration);
 builder.Services.AddIdentityCore<User>(
@@ -45,6 +45,9 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUser, CurrentUserService>();
 builder.Services.AddScoped<IVacancyService, VacancyService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
+builder.Services.AddScoped<IResumeService, ResumeService>();
+builder.Services.AddScoped<ICrmService, CrmService>();
 builder.Services.AddSingleton<IHttpContextAccessor,HttpContextAccessor>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
@@ -58,7 +61,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", builder =>
     {
-        builder.WithOrigins("http://localhost:5173")
+        builder.WithOrigins("http://localhost:5176")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });

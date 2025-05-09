@@ -4,8 +4,10 @@ using System.Text;
 using Application.Dtos.User;
 using Application.Exceptions;
 using Application.Interfaces;
+using Application.Validators;
 using Domain.Enums;
 using Domain.Models;
+using FluentValidation;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces;
 using Infrastructure.ValidationOptions;
@@ -16,7 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Application.Services;
 
-public class AuthService(UserManager<User> userManager, IOptions<JwtOptions> jwtOptions, IUnitOfWork unitOfWork,RoleManager<IdentityRole<int>> roleManager)
+public class AuthService(UserManager<User> userManager, IOptions<JwtOptions> jwtOptions, IUnitOfWork unitOfWork,RoleManager<IdentityRole<int>> roleManager,IValidator<BaseUserDto> validator)
     : IAuthService
 {
     private readonly IRepository<User> _userRepository = unitOfWork.Repository<User>();
@@ -48,7 +50,7 @@ public class AuthService(UserManager<User> userManager, IOptions<JwtOptions> jwt
         return result;
     }
 
-    public async Task<TokenDto> Refresh(string refreshToken)
+    public async Task<LoginResponseDto> Refresh(string refreshToken)
     {
         JwtSecurityTokenHandler tokenHandler = new();
         TokenValidationParameters validationParameters = new()
@@ -76,12 +78,19 @@ public class AuthService(UserManager<User> userManager, IOptions<JwtOptions> jwt
         var role = await GetRoleByUserAsync(user);
         var newAccessToken = GenerateAccessToken(userId, role);
         var newRefreshToken = GenerateRefreshToken(userId);
-        return CreateTokensDto(newAccessToken, newRefreshToken);
+        var userProfileWithRole = await _userRepository.GetUserWithRoleById(user.Id);
+        var result = new LoginResponseDto()
+        {
+            UserResponseDto = userProfileWithRole.Adapt<UserResponseDto>(),
+            TokenDto = CreateTokensDto(newAccessToken, newRefreshToken)
+        };
+        return result;
     }
 
 
     public async Task<UserResponseDto> Register(RegisterUserDto dto)
     {
+        validator.ValidateAndThrow(dto);
         var user = dto.Adapt<User>();
         var roleName = dto.Role.ToString();
         await ValidateRoleAsync(dto.Role);

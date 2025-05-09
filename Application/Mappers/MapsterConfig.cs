@@ -1,5 +1,7 @@
 using Application.Dtos;
+using Application.Dtos.Resume;
 using Application.Dtos.User;
+using Application.Dtos.Vacancy;
 using Domain.Models;
 using Mapster;
 
@@ -9,7 +11,7 @@ public static class MapsterConfig
 {
     public static void VacancyMappings()
     {
-        TypeAdapterConfig<VacancyDto, Vacancy>
+        TypeAdapterConfig<VacancyRequestDto, Vacancy>
             .NewConfig()
             .Map(dest => dest.Name, src => src.Name)
             .Map(dest => dest.Description, src => src.Description)
@@ -38,5 +40,20 @@ public static class MapsterConfig
             .Map(x => x.Lastname, y => y.User.Lastname)
             .Map(x => x.Username, y => y.User.UserName)
             .Map(x => x.Email, y => y.User.Email);
+    }
+
+    public static void ResumeMappings()
+    {
+        TypeAdapterConfig<ResumeRequestDto, Resume>
+            .NewConfig()
+            .Map(x => x.Candidate,y => y.Candidate)
+            .Map(x => x.YearsOfExperience, y => y.YearsOfExperience)
+            .Map(x => x.Educations, y => y.Educations);
+        TypeAdapterConfig<Resume, ResumeResponseDto>
+            .NewConfig()
+            .Map(x => x.Candidate, y => y.Candidate)
+            .Map(x => x.YearsOfExperience, y => y.YearsOfExperience)
+            .Map(x => x.Educations, y => y.Educations)
+            .Map(x => x.JobExperiences, y => y.JobExperiences);
     }
 }
