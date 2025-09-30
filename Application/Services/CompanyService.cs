@@ -6,7 +6,8 @@ using Mapster;
 
 namespace Application.Services;
 
-public class CompanyService(IUnitOfWork unitOfWork) : ICompanyService
+public class 
+    CompanyService(IUnitOfWork unitOfWork) : ICompanyService
 {
     private readonly IRepository<Company> _repository = unitOfWork.Repository<Company>();
 

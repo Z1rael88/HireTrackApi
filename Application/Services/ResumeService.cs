@@ -1,14 +1,12 @@
-using System.Collections;
 using Application.Dtos.Resume;
 using Application.Interfaces;
 using Domain.Models;
 using Infrastructure.Interfaces;
 using Mapster;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
-public class ResumeService(IUnitOfWork unitOfWork,ICrmService crmService) : IResumeService
+public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService) : IResumeService
 {
     private readonly IRepository<Resume> _repository = unitOfWork.Repository<Resume>();
     private readonly IResumeRepository _resumeRepository = unitOfWork.Resumes;
@@ -17,6 +15,17 @@ public class ResumeService(IUnitOfWork unitOfWork,ICrmService crmService) : IRes
     {
         var resume = dto.Adapt<Resume>();
         var createdResume = await _repository.CreateAsync(resume);
+        createdResume.VacancyResumes = new List<VacancyResume>
+        {
+            new()
+            {
+                ResumeId = createdResume.Id,
+                VacancyId = dto.VacancyId ?? throw new Exception("Resume is not linked to Vacancy")
+            }
+        };
+
+        await _repository.SaveChangesAsync();
+
         var typeIds = createdResume.JobExperiences
             .SelectMany(x => x.Technologies)
             .Select(t => t.TechnologyTypeId)
@@ -25,9 +34,9 @@ public class ResumeService(IUnitOfWork unitOfWork,ICrmService crmService) : IRes
         var types = await crmService.GetAllTechnologyTypes();
         var mappedTypes = types.Adapt<IList<TechnologyType>>();
         var matchingTypes = mappedTypes
-            .Where(tt => typeIds.Contains(tt.Id)).ToDictionary(tt=>tt.Id);
+            .Where(tt => typeIds.Contains(tt.Id)).ToDictionary(tt => tt.Id);
 
-        foreach (var tech in createdResume.JobExperiences.SelectMany(x=>x.Technologies))
+        foreach (var tech in createdResume.JobExperiences.SelectMany(x => x.Technologies))
         {
             tech.TechnologyType = matchingTypes[tech.TechnologyTypeId];
         }

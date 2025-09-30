@@ -11,4 +11,5 @@ public class ResumeRequestDto
     public ICollection<LanguageLevelDto> LanguageLevels { get; set; } 
     public ICollection<JobExperienceRequestDto> JobExperiences { get; set; } 
     public ICollection<EducationRequestDto> Educations { get; set; } 
+    public int? VacancyId { get; set; }
 }

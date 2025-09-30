@@ -13,6 +13,7 @@ using Infrastructure.Interfaces;
 using Infrastructure.ValidationOptions;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -25,10 +26,10 @@ public class AuthService(UserManager<User> userManager, IOptions<JwtOptions> jwt
 
     public async Task<LoginResponseDto> Login(LoginUserDto dto)
     {
-        var user = await userManager.FindByNameAsync(dto.Username);
+        var user = await userManager.FindByEmailAsync(dto.Email);
         if (user == null)
         {
-            throw new NotFoundException($"User with userName {dto.Username} not found");
+            throw new NotFoundException($"User with that email is not found");
         }
 
         bool isPasswordValid = await userManager.CheckPasswordAsync(user, dto.Password);
@@ -115,7 +116,7 @@ public class AuthService(UserManager<User> userManager, IOptions<JwtOptions> jwt
         {
             throw new IdentityException("User creation failed", userCreationResult.Errors);
         }
-
+            //rollback mechanism
         var roleAssignmentResult = await userManager.AddToRoleAsync(user, roleName);
         if (!roleAssignmentResult.Succeeded)
         {

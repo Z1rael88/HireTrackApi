@@ -16,6 +16,7 @@ namespace Infrastructure.Interfaces
 
         Task DeleteAsync(int id);
         Task<UserWithRole> GetUserWithRoleById(int userId);
+        Task SaveChangesAsync();
         IQueryable<T> Query();
     }
 }

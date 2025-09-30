@@ -19,6 +19,7 @@ namespace Infrastructure.Repositories
             await DbContext.SaveChangesAsync();
             return newEntity.Entity;
         }
+
         public IQueryable<T> Query()
         {
             return dbContext.Set<T>().AsQueryable();
@@ -75,6 +76,11 @@ namespace Infrastructure.Repositories
         {
             return await dbContext.Users.Where(x => x.Id == id).SingleOrDefaultAsync() ??
                    throw new NotFoundException($"User with id: {id} not found");
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await dbContext.SaveChangesAsync();
         }
 
         private async Task<string?> GetUserRoleNameAsync(int userId)
