@@ -29,7 +29,7 @@ public class VacancyConfiguration
             .WithMany()
             .HasForeignKey(x=>x.HrId);
         builder.HasOne(x => x.Company)
-            .WithMany()
+            .WithMany(x=>x.Vacancies)
             .HasForeignKey(x => x.CompanyId);
     }
 }

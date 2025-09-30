@@ -12,14 +12,15 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<User> ApplicationUsers { get; set; }
     public DbSet<Vacancy> Vacancies { get; set; }
-    public DbSet<Resume> Resumes { get; }
-    public DbSet<Language> Languages { get; }
-    public DbSet<ResumeLanguage> ResumeLanguages { get; }
-    public DbSet<Education> Educations { get; }
-    public DbSet<Technology> Technologies { get; }
-    public DbSet<TechnologyType> TechnologyTypes { get; }
-    public DbSet<JobExperience> JobExperiences { get; }
-    public DbSet<Company> Companies { get; }
+    public DbSet<Resume> Resumes { get; set; }
+    public DbSet<Education> Educations { get; set; }
+    public DbSet<Technology> Technologies { get; set; }
+    public DbSet<TechnologyType> TechnologyTypes { get; set; }
+    public DbSet<JobExperience> JobExperiences { get; set; }
+    public DbSet<Company> Companies { get; set; }
+    public DbSet<LanguageLevel> LanguageLevels { get; set; }
+    public DbSet<Candidate> Candidates{ get; set; }
+    public DbSet<VacancyResume> VacancyResumes { get; set; }
 
     public async Task<int> SaveChangesAsync()
     {
@@ -36,13 +37,14 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         modelBuilder.ApplyConfiguration(new VacancyConfiguration());
         modelBuilder.ApplyConfiguration(new UserConfiguration());
-        modelBuilder.ApplyConfiguration(new LanguageConfiguration());
+        modelBuilder.ApplyConfiguration(new LanguageLevelConfiguration());
         modelBuilder.ApplyConfiguration(new ResumeConfiguration());
-        modelBuilder.ApplyConfiguration(new ResumeLanguageConfiguration());
         modelBuilder.ApplyConfiguration(new TechnologyConfiguration());
         modelBuilder.ApplyConfiguration(new TechnologyTypeConfiguration());
         modelBuilder.ApplyConfiguration(new EducationConfiguration());
         modelBuilder.ApplyConfiguration(new JobExperienceConfiguration());
         modelBuilder.ApplyConfiguration(new CompanyConfiguration());
+        modelBuilder.ApplyConfiguration(new CandidateConfiguration());
+        modelBuilder.ApplyConfiguration(new VacancyResumeConfiguration());
     }
 }

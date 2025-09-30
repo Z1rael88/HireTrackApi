@@ -1,4 +1,5 @@
 using Domain.Interfaces;
+using Domain.Models;
 using Infrastructure.Data;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces;
@@ -17,6 +18,11 @@ namespace Infrastructure.Repositories
             var newEntity = await Entities.AddAsync(entity);
             await DbContext.SaveChangesAsync();
             return newEntity.Entity;
+        }
+
+        public IQueryable<T> Query()
+        {
+            return dbContext.Set<T>().AsQueryable();
         }
 
         public async Task<T> UpdateAsync(T entity)
@@ -53,6 +59,40 @@ namespace Infrastructure.Repositories
             }
 
             await UpdateAsync(entity);
+        }
+
+        public async Task<UserWithRole> GetUserWithRoleById(int userId)
+        {
+            var user = await GetUserById(userId);
+            var role = await GetUserRoleNameAsync(userId);
+            return new UserWithRole
+            {
+                Role = role,
+                User = user
+            };
+        }
+
+        public async Task<User> GetUserById(int id)
+        {
+            return await dbContext.Users.Where(x => x.Id == id).SingleOrDefaultAsync() ??
+                   throw new NotFoundException($"User with id: {id} not found");
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await dbContext.SaveChangesAsync();
+        }
+
+        private async Task<string?> GetUserRoleNameAsync(int userId)
+        {
+            return await DbContext.UserRoles
+                .Where(ur => ur.UserId == userId)
+                .Join(
+                    DbContext.Roles,
+                    ur => ur.RoleId,
+                    r => r.Id,
+                    (ur, r) => r.Name)
+                .SingleOrDefaultAsync();
         }
     }
 }

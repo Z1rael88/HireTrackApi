@@ -1,9 +1,10 @@
 using Application.Dtos;
+using Application.Dtos.Vacancy;
 using FluentValidation;
 
 namespace Application.Validators;
 
-public class VacancyValidator : AbstractValidator<VacancyDto>
+public class VacancyValidator : AbstractValidator<VacancyRequestDto>
 {
     public VacancyValidator()
     {

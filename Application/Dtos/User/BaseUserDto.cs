@@ -8,7 +8,5 @@ public abstract class BaseUserDto
     public required string Email { get; set; } 
     public required string Username { get; set; } 
     public required int Age { get; set; }
-    public required bool IsDeleted { get; set; }
-    public required bool IsActive { get; set; }
     public Role Role { get; set; }
 }

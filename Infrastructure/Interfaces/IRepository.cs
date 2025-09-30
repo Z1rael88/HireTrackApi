@@ -1,4 +1,5 @@
 using Domain.Interfaces;
+using Domain.Models;
 
 namespace Infrastructure.Interfaces
 {
@@ -14,5 +15,8 @@ namespace Infrastructure.Interfaces
         Task<T> GetByIdAsync(int id);
 
         Task DeleteAsync(int id);
+        Task<UserWithRole> GetUserWithRoleById(int userId);
+        Task SaveChangesAsync();
+        IQueryable<T> Query();
     }
 }

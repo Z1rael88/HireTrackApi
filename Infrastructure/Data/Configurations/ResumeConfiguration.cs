@@ -8,12 +8,9 @@ public class ResumeConfiguration : BaseEntityConfiguration<Resume>
     public override void Configure(EntityTypeBuilder<Resume> builder)
     {
         base.Configure(builder);
-        builder.Property(x => x.Firstname).IsRequired();
-        builder.Property(x => x.Lastname).IsRequired();
-        builder.Property(x => x.Bio).IsRequired();
         builder.Property(x => x.YearsOfExperience).IsRequired();
-        builder.HasMany(x => x.ResumeLanguages)
-            .WithOne(x => x.Resume)
+        builder.HasMany(x => x.LanguageLevels)
+            .WithOne()
             .HasForeignKey(x => x.ResumeId);
         builder.HasOne(x => x.Candidate)
             .WithMany()
