@@ -1,5 +1,7 @@
 using Application.Dtos;
+using Application.Dtos.Requirements;
 using Application.Dtos.Resume;
+using Application.Dtos.Resume.Technology;
 using Application.Dtos.User;
 using Application.Dtos.Vacancy;
 using Domain.Models;
@@ -22,6 +24,40 @@ public static class MapsterConfig
             .Map(dest => dest.LanguageLevelRequirements, src => src.Requirements.LanguageLevels)
             .Map(dest => dest.JobExperienceRequirements, src => src.Requirements.JobExperiences)
             .Map(dest => dest.YearsOfExperience, src => src.Requirements.YearsOfExperience);
+        TypeAdapterConfig<LanguageLevelRequirement, LanguageLevelRequirementDto>
+            .NewConfig()
+            .Map(dest => dest.Language, src => src.Language)
+            .Map(dest => dest.Level, src => src.Level);
+        TypeAdapterConfig<JobExperienceRequirement, JobExperienceRequirementDto>
+            .NewConfig()
+            .Map(dest => dest.TechnologyRequirements, src => src.TechnologyRequirements);
+        
+        TypeAdapterConfig<EducationRequirement, EducationRequirementDto>
+            .NewConfig()
+            .Map(dest => dest.Degree, src => src.Degree)
+            .Map(dest => dest.EducationType, src => src.EducationType);
+
+        TypeAdapterConfig<TechnologyRequirement, TechnologyRequirementDto>
+            .NewConfig() 
+            .Map(dest => dest.TechnologyTypeId, src => src.TechnologyTypeId)
+            .Map(dest => dest.Name, src => src.Name)
+            .Map(dest => dest.YearsOfExperience, src => src.YearsOfExperience);
+        TypeAdapterConfig<Vacancy, VacancyResponseDto>
+            .NewConfig()
+            .Map(dest => dest.Requirements, src => new RequirementsResponseDto()
+            {
+                LanguageLevels = src.LanguageLevelRequirements.Adapt<ICollection<LanguageLevelRequirementDto>>(),
+                JobExperiences = src.JobExperienceRequirements.Adapt<ICollection<JobExperienceRequirementResponseDto>>(),
+                Educations = src.EducationsRequirements.Adapt<ICollection<EducationRequirementDto>>(),
+                YearsOfExperience = src.YearsOfExperience
+            });
+           
+        TypeAdapterConfig<TechnologyType, TechnologyTypeDto>
+            .NewConfig();
+        TypeAdapterConfig<TechnologyRequirement, TechnologyRequirementResponseDto>
+            .NewConfig()
+            .Map(dest => dest.TechnologyTypeDto, src =>src.TechnologyType);
+
     }
 
     public static void UserMappings()

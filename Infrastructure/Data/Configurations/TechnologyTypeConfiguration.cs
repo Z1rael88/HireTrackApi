@@ -8,6 +8,8 @@ public class TechnologyTypeConfiguration : BaseEntityConfiguration<TechnologyTyp
     public override void Configure(EntityTypeBuilder<TechnologyType> builder)
     {
         base.Configure(builder);
+        builder.HasIndex(x => x.Name)
+            .IsUnique();
         builder.Property(x => x.Name).IsRequired();
         builder.Property(x => x.LogoUrl).IsRequired();
         builder.Property(x => x.TechnologyCategory).IsRequired();
