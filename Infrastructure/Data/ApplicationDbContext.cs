@@ -46,5 +46,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.ApplyConfiguration(new CompanyConfiguration());
         modelBuilder.ApplyConfiguration(new CandidateConfiguration());
         modelBuilder.ApplyConfiguration(new VacancyResumeConfiguration());
+        modelBuilder.ApplyConfiguration(new TechnologyRequirementConfiguration());
+        modelBuilder.ApplyConfiguration(new LanguageLevelRequirementConfiguration());
+        modelBuilder.ApplyConfiguration(new JobExperienceRequirementConfiguration());
+        modelBuilder.ApplyConfiguration(new EducationRequirementConfiguration());
     }
 }

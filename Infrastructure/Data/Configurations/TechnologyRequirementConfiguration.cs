@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Data.Configurations;
 
-public class TechnologyConfiguration : BaseEntityConfiguration<Technology>
+public class TechnologyRequirementConfiguration : BaseEntityConfiguration<TechnologyRequirement>
 {
-    public override void Configure(EntityTypeBuilder<Technology> builder)
+    public override void Configure(EntityTypeBuilder<TechnologyRequirement> builder)
     {
         base.Configure(builder);
         builder.Property(x => x.Name).IsRequired();

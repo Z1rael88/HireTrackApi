@@ -18,18 +18,24 @@ public class VacancyConfiguration
         builder.Property(a => a.Description)
             .HasMaxLength(250)
             .IsRequired();
-        builder.Property(x => x.AddDate)
-            .IsRequired();
-        builder.Property(x => x.EndDate)
-            .IsRequired();
-        builder.Property(a => a.Salary)
-            .IsRequired();
-        builder.Property(x => x.CompanyName).IsRequired();
+        builder.Property(x => x.AddDate).IsRequired();
+        builder.Property(x => x.EndDate).IsRequired();
+        builder.Property(a => a.Salary) .IsRequired();
+        builder.Property(x => x.YearsOfExperience).IsRequired();
         builder.HasOne(x=>x.Hr)
             .WithMany()
             .HasForeignKey(x=>x.HrId);
         builder.HasOne(x => x.Company)
             .WithMany(x=>x.Vacancies)
             .HasForeignKey(x => x.CompanyId);
+        builder.HasMany(x => x.LanguageLevelRequirements)
+            .WithOne()
+            .HasForeignKey(x => x.VacancyId);
+        builder.HasMany(x => x.EducationsRequirements)
+            .WithOne()
+            .HasForeignKey(x => x.VacancyId);
+        builder.HasMany(x => x.JobExperienceRequirements)
+            .WithOne()
+            .HasForeignKey(x => x.VacancyId);
     }
 }

@@ -1,5 +1,3 @@
-using Domain.Interfaces;
-
 namespace Domain.Models;
 
 public class JobExperience : BaseEntity

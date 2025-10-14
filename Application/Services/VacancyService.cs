@@ -1,4 +1,3 @@
-using Application.Dtos;
 using Application.Dtos.Vacancy;
 using Application.Interfaces;
 using Domain.Models;
@@ -12,14 +11,11 @@ public class VacancyService(IUnitOfWork unitOfWork, IValidator<VacancyRequestDto
 {
     private readonly IRepository<Vacancy> _repository = unitOfWork.Repository<Vacancy>();
     private readonly IVacancyRepository _vacancyRepository = unitOfWork.Vacancies;
-    private readonly IRepository<Company> _companyRepository = unitOfWork.Repository<Company>();
 
     public async Task<VacancyResponseDto> CreateVacancyAsync(VacancyRequestDto vacancyRequestDto)
     {
         validator.ValidateAndThrow(vacancyRequestDto);
         var mappedVacancy = vacancyRequestDto.Adapt<Vacancy>();
-        var company = await _companyRepository.GetByIdAsync(vacancyRequestDto.CompanyId);
-        mappedVacancy.CompanyName = company.Name;
         mappedVacancy.HrId = user.Id;
         var createdVacancy = await _repository.CreateAsync(mappedVacancy);
         return createdVacancy.Adapt<VacancyResponseDto>();

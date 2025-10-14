@@ -17,7 +17,11 @@ public static class MapsterConfig
             .Map(dest => dest.Description, src => src.Description)
             .Map(dest => dest.Salary, src => src.Salary)
             .Map(dest => dest.AddDate, src => src.AddDate)
-            .Map(dest => dest.EndDate, src => src.EndDate);
+            .Map(dest => dest.EndDate, src => src.EndDate)
+            .Map(dest => dest.EducationsRequirements, src => src.Requirements.Educations)
+            .Map(dest => dest.LanguageLevelRequirements, src => src.Requirements.LanguageLevels)
+            .Map(dest => dest.JobExperienceRequirements, src => src.Requirements.JobExperiences)
+            .Map(dest => dest.YearsOfExperience, src => src.Requirements.YearsOfExperience);
     }
 
     public static void UserMappings()
@@ -27,7 +31,8 @@ public static class MapsterConfig
             .Map(x => x.Firstname, y => y.FirstName)
             .Map(x => x.Lastname, y => y.LastName)
             .Map(x => x.Age, y => y.Age)
-            .Map(x => x.UserName, y => y.Username)
+            .Map(x => x.Email, y => y.Email)
+            .Map(x => x.UserName, y => y.Email)
             .Map(x => x.Firstname, y => y.FirstName);
         TypeAdapterConfig<User, UserResponseDto>
             .NewConfig()
@@ -46,7 +51,7 @@ public static class MapsterConfig
     {
         TypeAdapterConfig<ResumeRequestDto, Resume>
             .NewConfig()
-            .Map(x => x.Candidate,y => y.Candidate)
+            .Map(x => x.Candidate, y => y.Candidate)
             .Map(x => x.YearsOfExperience, y => y.YearsOfExperience)
             .Map(x => x.Educations, y => y.Educations);
         TypeAdapterConfig<Resume, ResumeResponseDto>

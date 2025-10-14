@@ -1,3 +1,5 @@
+using Application.Dtos.Requirements;
+
 namespace Application.Dtos.Vacancy;
 
 public class VacancyRequestDto 
@@ -8,5 +10,6 @@ public class VacancyRequestDto
     public decimal Salary { get; set; }
     public DateOnly AddDate { get; set; }
     public DateOnly EndDate { get; set; }
+    public RequirementsDto Requirements { get; set; }
 }
 
