@@ -1,5 +1,6 @@
 using Application.Dtos.Resume;
 using Application.Interfaces;
+using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;
@@ -26,5 +27,12 @@ public class ResumeController(IResumeService resumeService) : ControllerBase
     {
         var resume = await resumeService.GetAllResumesByVacancyIdAsync(vacancyId);
         return Ok(resume);
+    }
+
+    [HttpPatch("changeStatus/{resumeId}")]
+    public async Task<IActionResult> ChangeResumeStatus(int resumeId,int vacancyId, ResumeStatus status)
+    {
+        await resumeService.ChangeStatusOfResumeAsync(resumeId, vacancyId,status);
+        return Ok();
     }
 }

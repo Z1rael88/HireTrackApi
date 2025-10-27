@@ -1,14 +1,16 @@
 using Application.Dtos.Resume;
 using Application.Interfaces;
+using Domain.Enums;
 using Domain.Models;
 using Infrastructure.Interfaces;
 using Mapster;
 
 namespace Application.Services;
 
-public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService) : IResumeService
+public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmailService emailService) : IResumeService
 {
     private readonly IRepository<Resume> _repository = unitOfWork.Repository<Resume>();
+    private readonly IRepository<VacancyResume> _vacancyResumeRepository = unitOfWork.Repository<VacancyResume>();
     private readonly IResumeRepository _resumeRepository = unitOfWork.Resumes;
 
     public async Task<ResumeResponseDto> CreateResumeAsync(ResumeRequestDto dto)
@@ -20,7 +22,8 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService) : IRe
             new()
             {
                 ResumeId = createdResume.Id,
-                VacancyId = dto.VacancyId ?? throw new Exception("Resume is not linked to Vacancy")
+                VacancyId = dto.VacancyId ?? throw new Exception("Resume is not linked to Vacancy"),
+                Status = ResumeStatus.Sent,
             }
         };
 
@@ -45,7 +48,6 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService) : IRe
         return result;
     }
 
-
     public async Task<ResumeResponseDto> GetResumeByIdAsync(int resumeId)
     {
         var resume = await _resumeRepository.GetResumeById(resumeId);
@@ -56,5 +58,16 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService) : IRe
     {
         var resumes = await _resumeRepository.GetAllResumesByVacancyId(vacancyId);
         return resumes.Adapt<ICollection<ResumeResponseDto>>();
+    }
+
+    public async Task ChangeStatusOfResumeAsync(int resumeId, int vacancyId, ResumeStatus status)
+    {
+        var vacancyResumes = await _resumeRepository.GetVacancyResumeByIds(vacancyId, resumeId);
+        vacancyResumes.Status = status;
+        await _vacancyResumeRepository.SaveChangesAsync();
+        var resume = await GetResumeByIdAsync(resumeId);
+        await emailService.SendEmailAsync(resume.Candidate.Email, "Status for your resume changed!",
+            $"Hello {resume.Candidate.Firstname} !" +
+            $"Status for your resume changed to {status}");
     }
 }

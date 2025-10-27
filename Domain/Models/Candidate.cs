@@ -1,3 +1,5 @@
+using Domain.Enums;
+
 namespace Domain.Models;
 
 public class Candidate : BaseEntity
@@ -7,4 +9,8 @@ public class Candidate : BaseEntity
     public string Bio { get; set; }
     public int Age { get; set; }
     public string Email { get; set; }
+    public Address Address { get; set; }
+    public WorkType WorkType { get; set; }
+    public int? UserId { get; set; }
+    public User? User { get; set; }
 }

@@ -9,6 +9,7 @@ public class ResumeConfiguration : BaseEntityConfiguration<Resume>
     {
         base.Configure(builder);
         builder.Property(x => x.YearsOfExperience).IsRequired();
+        builder.Property(x => x.ExpectedSalary).IsRequired();
         builder.HasMany(x => x.LanguageLevels)
             .WithOne()
             .HasForeignKey(x => x.ResumeId);

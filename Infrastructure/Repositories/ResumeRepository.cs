@@ -9,11 +9,16 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
 {
     public async Task<ICollection<Resume>> GetAllResumesByVacancyId(int vacancyId)
     {
-        return await dbContext.VacancyResumes.AsNoTracking()
-            .Where(x => x.VacancyId == vacancyId)
-            .Include(x => x.Resume)
-            .Select(x => x.Resume)
-            .ToListAsync();
+        return await dbContext.Resumes
+            .AsNoTracking()
+            .Include(x => x.Candidate)
+            .Include(x => x.Educations)
+            .Include(x => x.LanguageLevels)
+            .Include(x => x.JobExperiences)
+            .ThenInclude(x => x.Technologies)
+            .ThenInclude(x => x.TechnologyType)
+            .Where(r => dbContext.VacancyResumes
+                .Any(vr => vr.VacancyId == vacancyId && vr.ResumeId == r.Id)).ToListAsync();
     }
 
     public async Task<Resume> GetResumeById(int resumeId)
@@ -27,6 +32,14 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
             .ThenInclude(x => x.Technologies)
             .ThenInclude(x => x.TechnologyType);
         return await query.SingleOrDefaultAsync() ??
-            throw new NotFoundException($"Resume with Id: {resumeId} not found");
+               throw new NotFoundException($"Resume with Id: {resumeId} not found");
+    }
+
+    public async Task<VacancyResume> GetVacancyResumeByIds(int vacancyId, int resumeId)
+    {
+        var query = dbContext.VacancyResumes
+            .Where(x => x.VacancyId == vacancyId && x.ResumeId == resumeId);
+        return await query.SingleOrDefaultAsync() ??
+               throw new NotFoundException("VacancyResume entity with those ids were not found");
     }
 }
