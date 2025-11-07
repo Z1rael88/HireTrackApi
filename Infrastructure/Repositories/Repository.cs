@@ -68,7 +68,8 @@ namespace Infrastructure.Repositories
             return new UserWithRole
             {
                 Role = role,
-                User = user
+                User = user,
+                CompanyId = user.CompanyId ?? null,
             };
         }
 

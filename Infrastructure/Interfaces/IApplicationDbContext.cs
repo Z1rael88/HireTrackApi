@@ -1,4 +1,5 @@
 using Domain.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Interfaces;
@@ -15,6 +16,5 @@ public interface IApplicationDbContext
     DbSet<LanguageLevel> LanguageLevels { get; }
     DbSet<Candidate> Candidates { get; }
     DbSet<VacancyResume> VacancyResumes { get; }
-
     Task<int> SaveChangesAsync();
 }

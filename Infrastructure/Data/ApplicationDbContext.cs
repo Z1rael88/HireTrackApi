@@ -21,7 +21,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<LanguageLevel> LanguageLevels { get; set; }
     public DbSet<Candidate> Candidates{ get; set; }
     public DbSet<VacancyResume> VacancyResumes { get; set; }
-
     public async Task<int> SaveChangesAsync()
     {
         return await base.SaveChangesAsync();
