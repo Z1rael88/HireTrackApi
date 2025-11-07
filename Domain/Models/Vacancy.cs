@@ -14,7 +14,7 @@ public class Vacancy : BaseEntity
     public Company Company { get; set; }
     public required int CompanyId { get; set; }
     public int YearsOfExperience { get; set; }
-    
+    public Address Address { get; set; }
     public required WorkType WorkType{ get; set; }
     public ICollection<LanguageLevelRequirement> LanguageLevelRequirements { get; set; } 
     public ICollection<JobExperienceRequirement> JobExperienceRequirements { get; set; } 

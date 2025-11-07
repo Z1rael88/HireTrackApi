@@ -49,7 +49,7 @@ public static class MapsterConfig
                 LanguageLevels = src.LanguageLevelRequirements.Adapt<ICollection<LanguageLevelRequirementDto>>(),
                 JobExperiences = src.JobExperienceRequirements.Adapt<ICollection<JobExperienceRequirementResponseDto>>(),
                 Educations = src.EducationsRequirements.Adapt<ICollection<EducationRequirementDto>>(),
-                YearsOfExperience = src.YearsOfExperience
+                YearsOfExperience = src.YearsOfExperience,
             });
            
         TypeAdapterConfig<TechnologyType, TechnologyTypeDto>

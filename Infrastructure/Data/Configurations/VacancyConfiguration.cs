@@ -1,4 +1,5 @@
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Data.Configurations;
@@ -39,5 +40,11 @@ public class VacancyConfiguration
         builder.HasMany(x => x.JobExperienceRequirements)
             .WithOne()
             .HasForeignKey(x => x.VacancyId);
+        
+        builder.OwnsOne(x => x.Address, a =>
+        {
+            a.Property(a => a.Country).HasColumnName("Country");
+            a.Property(a => a.City).HasColumnName("City");
+        });
     }
 }
