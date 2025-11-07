@@ -483,6 +483,9 @@ namespace Infrastructure.Migrations
                     b.Property<decimal>("Salary")
                         .HasColumnType("numeric");
 
+                    b.Property<int>("WorkType")
+                        .HasColumnType("integer");
+
                     b.Property<int>("YearsOfExperience")
                         .HasColumnType("integer");
 

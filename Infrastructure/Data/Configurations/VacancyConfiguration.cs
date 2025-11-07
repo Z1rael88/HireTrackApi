@@ -22,6 +22,8 @@ public class VacancyConfiguration
         builder.Property(x => x.EndDate).IsRequired();
         builder.Property(a => a.Salary) .IsRequired();
         builder.Property(x => x.YearsOfExperience).IsRequired();
+        builder.Property(x => x.WorkType).IsRequired();
+
         builder.HasOne(x=>x.Hr)
             .WithMany()
             .HasForeignKey(x=>x.HrId);

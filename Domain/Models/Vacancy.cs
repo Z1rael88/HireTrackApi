@@ -1,3 +1,5 @@
+using Domain.Enums;
+
 namespace Domain.Models;
 
 public class Vacancy : BaseEntity
@@ -12,6 +14,8 @@ public class Vacancy : BaseEntity
     public Company Company { get; set; }
     public required int CompanyId { get; set; }
     public int YearsOfExperience { get; set; }
+    
+    public required WorkType WorkType{ get; set; }
     public ICollection<LanguageLevelRequirement> LanguageLevelRequirements { get; set; } 
     public ICollection<JobExperienceRequirement> JobExperienceRequirements { get; set; } 
     public ICollection<EducationRequirement> EducationsRequirements { get; set; }

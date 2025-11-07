@@ -1,4 +1,6 @@
 using Application.Dtos.Requirements;
+using Domain.Enums;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Application.Dtos.Vacancy;
 
@@ -12,5 +14,6 @@ public class VacancyResponseDto
     public decimal Salary { get; set; }
     public DateOnly AddDate { get; set; }
     public DateOnly EndDate { get; set; }
+    public WorkType WorkType { get; set; }
     public RequirementsResponseDto Requirements { get; set; }
 }

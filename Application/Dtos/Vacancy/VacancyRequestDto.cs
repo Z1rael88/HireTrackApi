@@ -1,4 +1,5 @@
 using Application.Dtos.Requirements;
+using Domain.Enums;
 
 namespace Application.Dtos.Vacancy;
 
@@ -11,5 +12,6 @@ public class VacancyRequestDto
     public DateOnly AddDate { get; set; }
     public DateOnly EndDate { get; set; }
     public RequirementsDto Requirements { get; set; }
+    public required WorkType WorkType{ get; set; }
 }
 
