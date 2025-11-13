@@ -17,15 +17,18 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
     {
         var resume = dto.Adapt<Resume>();
         var createdResume = await _repository.CreateAsync(resume);
-        createdResume.VacancyResumes = new List<VacancyResume>
+        if (dto.VacancyId is not 0)
         {
-            new()
+            createdResume.VacancyResumes = new List<VacancyResume>
             {
-                ResumeId = createdResume.Id,
-                VacancyId = dto.VacancyId ?? throw new Exception("Resume is not linked to Vacancy"),
-                Status = ResumeStatus.Sent,
-            }
-        };
+                new()
+                {
+                    ResumeId = createdResume.Id,
+                    VacancyId = (int)dto.VacancyId!,
+                    Status = ResumeStatus.Sent,
+                }
+            };
+        }
 
         await _repository.SaveChangesAsync();
 

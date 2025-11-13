@@ -15,6 +15,24 @@ public class CrmController(ICrmService crmService) : ControllerBase
         var languages = Enum.GetNames(typeof(Language));
         return Ok(languages);
     }
+    [HttpGet("languageLevels")]
+    public IActionResult GetAllLanguageLevels()
+    {
+        var languageLevels = Enum.GetNames(typeof(LanguageLevel));
+        return Ok(languageLevels);
+    }
+    [HttpGet("degrees")]
+    public IActionResult GetAllDegrees()
+    {
+        var degrees = Enum.GetNames(typeof(Degree));
+        return Ok(degrees);
+    }
+    [HttpGet("educationTypes")]
+    public IActionResult GetAllEducationTypes()
+    {
+        var educationTypes = Enum.GetNames(typeof(EducationType));
+        return Ok(educationTypes);
+    }
     [HttpGet("technologyCategories")]
     public IActionResult GetAllTechCategories()
     {
