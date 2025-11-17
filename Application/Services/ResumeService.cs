@@ -4,10 +4,11 @@ using Domain.Enums;
 using Domain.Models;
 using Infrastructure.Interfaces;
 using Mapster;
+using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services;
 
-public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmailService emailService) : IResumeService
+public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmailService emailService,UserManager<User> userManager) : IResumeService
 {
     private readonly IRepository<Resume> _repository = unitOfWork.Repository<Resume>();
     private readonly IRepository<VacancyResume> _vacancyResumeRepository = unitOfWork.Repository<VacancyResume>();
@@ -45,6 +46,12 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
         foreach (var tech in createdResume.JobExperiences.SelectMany(x => x.Technologies))
         {
             tech.TechnologyType = matchingTypes[tech.TechnologyTypeId];
+        }
+
+        var user = await userManager.FindByEmailAsync(resume.Candidate.Email);
+        if ( user is not null)
+        {
+            resume.Candidate.UserId = user.Id;
         }
 
         var result = createdResume.Adapt<ResumeResponseDto>();

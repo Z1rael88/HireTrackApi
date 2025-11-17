@@ -31,7 +31,7 @@ public class VacancyService(IUnitOfWork unitOfWork, IValidator<VacancyRequestDto
 
     public async Task<VacancyResponseDto> GetVacancyByIdAsync(int vacancyId)
     {
-        var vacancy = await _repository.GetByIdAsync(vacancyId);
+        var vacancy = await _vacancyRepository.GetByIdAsync(vacancyId);
         return vacancy.Adapt<VacancyResponseDto>();
     }
 

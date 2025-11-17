@@ -47,6 +47,8 @@ public static class MapsterConfig
             .Map(dest => dest.Requirements, src => new RequirementsResponseDto()
             {
                 LanguageLevels = src.LanguageLevelRequirements.Adapt<ICollection<LanguageLevelRequirementDto>>(),
+                Education = src.EducationsRequirement.Adapt<EducationRequirementDto>(),
+                JobExperience = src.JobExperienceRequirement.Adapt<JobExperienceRequirementResponseDto>(),
                 YearsOfExperience = src.YearsOfExperience,
             });
            

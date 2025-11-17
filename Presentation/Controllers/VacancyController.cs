@@ -1,4 +1,3 @@
-using Application.Dtos;
 using Application.Dtos.Vacancy;
 using Application.Interfaces;
 using Domain.Enums;
