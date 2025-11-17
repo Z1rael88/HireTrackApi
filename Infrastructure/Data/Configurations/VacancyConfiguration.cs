@@ -34,12 +34,7 @@ public class VacancyConfiguration
         builder.HasMany(x => x.LanguageLevelRequirements)
             .WithOne()
             .HasForeignKey(x => x.VacancyId);
-        builder.HasMany(x => x.EducationsRequirements)
-            .WithOne()
-            .HasForeignKey(x => x.VacancyId);
-        builder.HasMany(x => x.JobExperienceRequirements)
-            .WithOne()
-            .HasForeignKey(x => x.VacancyId);
+        
         
         builder.OwnsOne(x => x.Address, a =>
         {

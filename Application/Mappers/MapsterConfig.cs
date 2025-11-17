@@ -20,9 +20,9 @@ public static class MapsterConfig
             .Map(dest => dest.Salary, src => src.Salary)
             .Map(dest => dest.AddDate, src => src.AddDate)
             .Map(dest => dest.EndDate, src => src.EndDate)
-            .Map(dest => dest.EducationsRequirements, src => src.Requirements.Educations)
+            .Map(dest => dest.EducationsRequirement, src => src.Requirements.Education)
             .Map(dest => dest.LanguageLevelRequirements, src => src.Requirements.LanguageLevels)
-            .Map(dest => dest.JobExperienceRequirements, src => src.Requirements.JobExperiences)
+            .Map(dest => dest.JobExperienceRequirement, src => src.Requirements.JobExperience)
             .Map(dest => dest.YearsOfExperience, src => src.Requirements.YearsOfExperience);
         TypeAdapterConfig<LanguageLevelRequirement, LanguageLevelRequirementDto>
             .NewConfig()
@@ -47,8 +47,6 @@ public static class MapsterConfig
             .Map(dest => dest.Requirements, src => new RequirementsResponseDto()
             {
                 LanguageLevels = src.LanguageLevelRequirements.Adapt<ICollection<LanguageLevelRequirementDto>>(),
-                JobExperiences = src.JobExperienceRequirements.Adapt<ICollection<JobExperienceRequirementResponseDto>>(),
-                Educations = src.EducationsRequirements.Adapt<ICollection<EducationRequirementDto>>(),
                 YearsOfExperience = src.YearsOfExperience,
             });
            

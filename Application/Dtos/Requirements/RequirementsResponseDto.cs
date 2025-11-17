@@ -4,6 +4,6 @@ public class RequirementsResponseDto
 {
     public int YearsOfExperience { get; set; }
     public ICollection<LanguageLevelRequirementDto> LanguageLevels { get; set; } 
-    public ICollection<JobExperienceRequirementResponseDto> JobExperiences { get; set; } 
-    public ICollection<EducationRequirementDto> Educations { get; set; }
+    public JobExperienceRequirementResponseDto JobExperience { get; set; } 
+    public EducationRequirementDto Education { get; set; }
 }

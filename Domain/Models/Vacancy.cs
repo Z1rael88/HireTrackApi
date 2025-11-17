@@ -17,7 +17,7 @@ public class Vacancy : BaseEntity
     public Address Address { get; set; }
     public required WorkType WorkType{ get; set; }
     public ICollection<LanguageLevelRequirement> LanguageLevelRequirements { get; set; } 
-    public ICollection<JobExperienceRequirement> JobExperienceRequirements { get; set; } 
-    public ICollection<EducationRequirement> EducationsRequirements { get; set; }
+    public JobExperienceRequirement JobExperienceRequirement { get; set; } 
+    public EducationRequirement EducationsRequirement { get; set; }
     public ICollection<VacancyResume> VacancyResumes { get; set; }
 }

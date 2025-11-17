@@ -7,8 +7,15 @@ namespace Presentation.Controllers;
 
 [ApiController]
 [Route("crm/")]
-public class CrmController(ICrmService crmService) : ControllerBase
+public class CrmController(ICrmService crmService,IStatisticService statisticService) : ControllerBase
 {
+    [HttpGet("statistics")]
+    public async Task<IActionResult> GetStatistics()
+    {
+        var result = await statisticService.GenerateStatisticsAsync(34,2);
+        return Ok(result);
+    }
+    
     [HttpGet("languages")]
     public IActionResult GetAllLanguages()
     {
