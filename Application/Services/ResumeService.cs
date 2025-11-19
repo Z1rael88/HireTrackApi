@@ -14,9 +14,21 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
     private readonly IRepository<VacancyResume> _vacancyResumeRepository = unitOfWork.Repository<VacancyResume>();
     private readonly IResumeRepository _resumeRepository = unitOfWork.Resumes;
 
-    public async Task<ResumeResponseDto> CreateResumeAsync(ResumeRequestDto dto)
+    public async Task<ResumeResponseDto?> CreateResumeAsync(ResumeRequestDto dto)
     {
         var resume = dto.Adapt<Resume>();
+        var isResumeExist = await _resumeRepository.GetResumeByCandidateEmail(resume.Candidate.Email) is not null;
+        if (dto.VacancyId is not 0 && isResumeExist)
+        {
+            var vacancyResumes = new VacancyResume
+            {
+                    ResumeId = resume.Id,
+                    VacancyId = (int)dto.VacancyId!,
+                    Status = ResumeStatus.Sent,
+            };
+            await _vacancyResumeRepository.CreateAsync(vacancyResumes);
+            return null;
+        }
         var createdResume = await _repository.CreateAsync(resume);
         if (dto.VacancyId is not 0)
         {
@@ -24,14 +36,12 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
             {
                 new()
                 {
-                    ResumeId = createdResume.Id,
                     VacancyId = (int)dto.VacancyId!,
-                    Status = ResumeStatus.Sent,
+                    ResumeId = createdResume.Id,
+                    Status = ResumeStatus.Sent
                 }
             };
         }
-
-        await _repository.SaveChangesAsync();
 
         var typeIds = createdResume.JobExperiences
             .SelectMany(x => x.Technologies)

@@ -42,4 +42,11 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
         return await query.SingleOrDefaultAsync() ??
                throw new NotFoundException("VacancyResume entity with those ids were not found");
     }
+
+    public async Task<Resume?> GetResumeByCandidateEmail(string email)
+    {
+        var resume = await dbContext.Resumes.Include(x=>x.Candidate)
+            .FirstOrDefaultAsync(x => x.Candidate.Email == email);
+        return resume;
+    }
 }
