@@ -35,4 +35,11 @@ public class ResumeController(IResumeService resumeService) : ControllerBase
         await resumeService.ChangeStatusOfResumeAsync(resumeId, vacancyId,status);
         return Ok();
     }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateResume(ResumeRequestDto resume, int resumeId)
+    {
+        await resumeService.UpdateResumeAsync(resume, resumeId);
+        return Ok();
+    }
 }

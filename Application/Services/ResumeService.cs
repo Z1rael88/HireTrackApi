@@ -90,4 +90,10 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
             $"Hello {resume.Candidate.Firstname} !" +
             $"Status for your resume changed to {status}");
     }
+
+    public async Task UpdateResumeAsync(ResumeRequestDto dto, int resumeId)
+    {
+        var resume = await _resumeRepository.GetResumeById(resumeId);
+        await _repository.UpdateAsync(resume);
+    }
 }
