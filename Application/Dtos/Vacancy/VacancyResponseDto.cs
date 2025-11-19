@@ -16,5 +16,6 @@ public class VacancyResponseDto
     public DateOnly EndDate { get; set; }
     public WorkType WorkType { get; set; }
     public AddressDto Address { get; set; }
+    public string Responsibilities { get; set; }
     public RequirementsResponseDto Requirements { get; set; }
 }

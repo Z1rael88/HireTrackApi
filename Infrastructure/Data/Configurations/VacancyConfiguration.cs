@@ -24,6 +24,7 @@ public class VacancyConfiguration
         builder.Property(a => a.Salary) .IsRequired();
         builder.Property(x => x.YearsOfExperience).IsRequired();
         builder.Property(x => x.WorkType).IsRequired();
+        builder.Property(x => x.Responsibilities).IsRequired();
 
         builder.HasOne(x=>x.Hr)
             .WithMany()

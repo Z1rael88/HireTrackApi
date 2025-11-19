@@ -15,5 +15,6 @@ public class VacancyRequestDto
     public RequirementsDto Requirements { get; set; }
     public required WorkType WorkType{ get; set; }
     public AddressDto Address { get; set; }
+    public string Responsibilities { get; set; } = string.Empty;
 }
 
