@@ -2,6 +2,7 @@ using Application.Dtos;
 using Application.Dtos.Requirements;
 using Application.Dtos.Resume;
 using Application.Dtos.Resume.Technology;
+using Application.Dtos.Statistics;
 using Application.Dtos.User;
 using Application.Dtos.Vacancy;
 using Domain.Models;
@@ -81,6 +82,10 @@ public static class MapsterConfig
             .Map(x => x.Lastname, y => y.User.Lastname)
             .Map(x => x.Username, y => y.User.UserName)
             .Map(x => x.Email, y => y.User.Email);
+        TypeAdapterConfig<Statistic, StatisticResponseDto>
+            .NewConfig()
+            .Map(dest => dest.EducationStatistics.EducationSummary, src => src.EducationSummary)
+            .Map(dest => dest.EducationStatistics.EducationMatchPercent, src => src.EducationMatchPercent);
     }
 
     public static void ResumeMappings()
