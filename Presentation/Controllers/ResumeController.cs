@@ -1,6 +1,8 @@
 using Application.Dtos.Resume;
 using Application.Interfaces;
 using Domain.Enums;
+using Domain.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;
@@ -41,5 +43,12 @@ public class ResumeController(IResumeService resumeService) : ControllerBase
     {
         await resumeService.UpdateResumeAsync(resume, resumeId);
         return Ok();
+    }
+
+    [HttpGet("byUserId{userId}")]
+    public async Task<IActionResult> GetResumeByUserId(int userId)
+    {
+       var resume = await resumeService.GetResumeByUserIdAsync(userId);
+        return Ok(resume);
     }
 }

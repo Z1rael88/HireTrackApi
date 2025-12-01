@@ -10,5 +10,6 @@ public interface IResumeService
     Task<IEnumerable<ResumeResponseDto>> GetAllResumesByVacancyIdAsync(int vacancyId);
     Task ChangeStatusOfResumeAsync(int resumeId,int vacancyId, ResumeStatus status);
     Task UpdateResumeAsync(ResumeRequestDto dto, int resumeId);
+    Task<ResumeResponseDto> GetResumeByUserIdAsync(int userId);
 
 }

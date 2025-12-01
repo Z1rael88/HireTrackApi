@@ -2,6 +2,7 @@ using Application.Dtos.User;
 using Application.Interfaces;
 using Domain.Enums;
 using Domain.Models;
+using Infrastructure.Exceptions;
 using Infrastructure.Interfaces;
 using Mapster;
 
@@ -11,6 +12,7 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
 {
     private IRepository<User> _userRepository = unitOfWork.Repository<User>();
     private IRepository<Company> _companyRepository = unitOfWork.Repository<Company>();
+    private IRepository<Candidate> _candidateRepository = unitOfWork.Repository<Candidate>();
 
     public async Task<UserWithCompanyResponseDto> GetUserProfileById(int userId)
     {
@@ -32,5 +34,16 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
         result.CompanyBusinessDomain = company.BusinessDomain;
 
         return result;
+    }
+
+    public async Task<UserWithCompanyResponseDto> GetUserByCandidateId(int candidateId)
+    {
+        var candidate = await _candidateRepository.GetByIdAsync(candidateId);
+        if (candidate.UserId is null)
+        {
+            throw new NotFoundException("There's no candidate or user id for candidate is null");
+        }
+        var user = await GetUserProfileById((int)candidate.UserId);
+        return user;
     }
 }

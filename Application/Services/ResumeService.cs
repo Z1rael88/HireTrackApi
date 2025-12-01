@@ -2,6 +2,7 @@ using Application.Dtos.Resume;
 using Application.Interfaces;
 using Domain.Enums;
 using Domain.Models;
+using Infrastructure.Exceptions;
 using Infrastructure.Interfaces;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
@@ -17,12 +18,12 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
     public async Task<ResumeResponseDto?> CreateResumeAsync(ResumeRequestDto dto)
     {
         var resume = dto.Adapt<Resume>();
-        var isResumeExist = await _resumeRepository.GetResumeByCandidateEmail(resume.Candidate.Email) is not null;
-        if (dto.VacancyId is not 0 && isResumeExist)
+        var existingResume = await _resumeRepository.GetResumeByCandidateEmail(resume.Candidate.Email);
+        if (dto.VacancyId is not 0 && existingResume is not null)
         {
             var vacancyResumes = new VacancyResume
             {
-                    ResumeId = resume.Id,
+                    ResumeId = existingResume.Id,
                     VacancyId = (int)dto.VacancyId!,
                     Status = ResumeStatus.Sent,
             };
@@ -42,7 +43,7 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
                 }
             };
         }
-
+        
         var typeIds = createdResume.JobExperiences
             .SelectMany(x => x.Technologies)
             .Select(t => t.TechnologyTypeId)
@@ -95,5 +96,13 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
     {
         var resume = await _resumeRepository.GetResumeById(resumeId);
         await _repository.UpdateAsync(resume);
+    }
+
+    public async Task<ResumeResponseDto> GetResumeByUserIdAsync(int userId)
+    {
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user!.Email is null) throw new NotFoundException("No user found with that Id");
+        var resume = await _resumeRepository.GetResumeByCandidateEmail(user.Email);
+        return resume.Adapt<ResumeResponseDto>();
     }
 }

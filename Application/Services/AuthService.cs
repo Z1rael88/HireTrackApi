@@ -4,7 +4,6 @@ using System.Text;
 using Application.Dtos.User;
 using Application.Exceptions;
 using Application.Interfaces;
-using Application.Validators;
 using Domain.Enums;
 using Domain.Models;
 using FluentValidation;
@@ -13,7 +12,6 @@ using Infrastructure.Interfaces;
 using Infrastructure.ValidationOptions;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -23,6 +21,8 @@ public class AuthService(UserManager<User> userManager, IOptions<JwtOptions> jwt
     : IAuthService
 {
     private readonly IRepository<User> _userRepository = unitOfWork.Repository<User>();
+    private readonly ICandidateRepository _candidateRepository = unitOfWork.Candidates;
+    private readonly IRepository<Candidate> _candidateDefaultRepository = unitOfWork.Repository<Candidate>();
 
     public async Task<LoginResponseDto> Login(LoginUserDto dto)
     {
@@ -98,6 +98,13 @@ public class AuthService(UserManager<User> userManager, IOptions<JwtOptions> jwt
         await CreateUserAndAssignRoleAsync(user, dto.Password,roleName );
         var resultDto = user.Adapt<UserResponseDto>();
         resultDto.Role = dto.Role;
+        
+        var candidate = await _candidateRepository.GetCandidateByEmailAsync(user.Email!);
+        if (candidate is not null)
+        {
+            candidate.UserId = user.Id;
+            await _candidateDefaultRepository.SaveChangesAsync();
+        }
         return resultDto;
     }
     private async Task ValidateRoleAsync(Role role)

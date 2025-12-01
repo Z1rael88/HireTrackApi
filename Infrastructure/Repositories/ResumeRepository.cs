@@ -45,7 +45,13 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
 
     public async Task<Resume?> GetResumeByCandidateEmail(string email)
     {
-        var resume = await dbContext.Resumes.Include(x=>x.Candidate)
+        var resume = await dbContext.Resumes
+            .Include(x => x.Candidate)
+            .Include(x => x.Educations)
+            .Include(x => x.LanguageLevels)
+            .Include(x => x.JobExperiences)
+            .ThenInclude(x => x.Technologies)
+            .ThenInclude(x => x.TechnologyType)
             .FirstOrDefaultAsync(x => x.Candidate.Email == email);
         return resume;
     }
