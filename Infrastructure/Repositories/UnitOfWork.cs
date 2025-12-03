@@ -20,7 +20,7 @@ namespace Infrastructure.Repositories
 
         public IVacancyRepository Vacancies => _vacancyRepository ??= new VacancyRepository(_dbContext);
         public IResumeRepository Resumes => _resumeRepository ??= new ResumeRepository(_dbContext);
-        public ICandidateRepository Candidates => _candidateRepository;
+        public ICandidateRepository Candidates => _candidateRepository ??= new CandidateRepository(_dbContext);
 
 
         public async Task SaveChangesAsync()
