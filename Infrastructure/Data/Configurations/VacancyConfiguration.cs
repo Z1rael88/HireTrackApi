@@ -14,8 +14,6 @@ public class VacancyConfiguration
         builder.Property(a => a.Name)
             .HasMaxLength(70)
             .IsRequired();
-        builder.HasIndex(a => a.Name)
-            .IsUnique();
         builder.Property(a => a.Description)
             .HasMaxLength(250)
             .IsRequired();
