@@ -3,7 +3,7 @@ namespace Domain.Models;
 public class Statistic : BaseEntity
 {
     public double TotalMatchPercent { get; set; }
-    public string Summary { get; set; } = string.Empty;
+    public StatisticsSummary Summary { get; set; } 
     public double LanguageMatchPercent { get; set; }
     public string LanguageSummary { get; set; } = string.Empty;
     public double EducationMatchPercent { get; set; }

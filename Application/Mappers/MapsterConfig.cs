@@ -41,7 +41,6 @@ public static class MapsterConfig
         TypeAdapterConfig<TechnologyRequirement, TechnologyRequirementDto>
             .NewConfig() 
             .Map(dest => dest.TechnologyTypeId, src => src.TechnologyTypeId)
-            .Map(dest => dest.Name, src => src.Name)
             .Map(dest => dest.YearsOfExperience, src => src.YearsOfExperience);
         TypeAdapterConfig<Vacancy, VacancyResponseDto>
             .NewConfig()

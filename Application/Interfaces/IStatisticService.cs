@@ -4,5 +4,5 @@ namespace Application.Interfaces;
 
 public interface IStatisticService
 {
-    Task<StatisticResponseDto> GenerateStatisticsAsync(int vacancyId, int resumeId);
+    Task<StatisticResponseDto> GenerateStatisticsForResume(int vacancyId, int resumeId);
 }

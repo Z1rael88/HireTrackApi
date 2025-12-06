@@ -1,8 +1,6 @@
 using Application.Dtos.Resume;
 using Application.Interfaces;
 using Domain.Enums;
-using Domain.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;

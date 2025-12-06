@@ -8,7 +8,6 @@ public class TechnologyRequirementConfiguration : BaseEntityConfiguration<Techno
     public override void Configure(EntityTypeBuilder<TechnologyRequirement> builder)
     {
         base.Configure(builder);
-        builder.Property(x => x.Name).IsRequired();
         builder.Property(x => x.YearsOfExperience).IsRequired();
         builder.HasOne(x=>x.TechnologyType)
             .WithMany()

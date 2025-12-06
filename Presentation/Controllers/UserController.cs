@@ -7,14 +7,14 @@ namespace Presentation.Controllers;
 [Route("users/")]
 public class UserController(IUserService userService) : ControllerBase
 {
-    [HttpGet("byUserId{userId}")]
+    [HttpGet("byUserId/{userId}")]
     public async Task<IActionResult> GetUserProfile(int userId)
     {
         var result = await userService.GetUserProfileById(userId);
         return Ok(result);
     }
 
-    [HttpGet("byCandidateId{candidateId}")]
+    [HttpGet("byCandidateId/{candidateId}")]
     public async Task<IActionResult> GetUserByCandidateId(int candidateId)
     {
         var result = await userService.GetUserByCandidateId(candidateId);

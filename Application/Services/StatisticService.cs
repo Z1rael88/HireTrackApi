@@ -1,4 +1,3 @@
-using System.Xml.Linq;
 using Application.Dtos.Statistics;
 using Application.Interfaces;
 using Domain.Enums;
@@ -7,6 +6,7 @@ using Infrastructure.Exceptions;
 using Infrastructure.Interfaces;
 using Mapster;
 using LanguageLevel = Domain.Models.LanguageLevel;
+using StatisticsSummary = Domain.Models.StatisticsSummary;
 
 namespace Application.Services;
 
@@ -15,11 +15,12 @@ public class StatisticService(IUnitOfWork unitOfWork) : IStatisticService
     private IVacancyRepository _vacancyRepository = unitOfWork.Vacancies;
     private IResumeRepository _resumeRepository = unitOfWork.Resumes;
 
-    public async Task<StatisticResponseDto> GenerateStatisticsAsync(int vacancyId, int resumeId)
+    public async Task<StatisticResponseDto> GenerateStatisticsForResume(int vacancyId, int resumeId)
     {
-        var vacancy = await _vacancyRepository.GetByIdAsync(vacancyId);
         var resume = await _resumeRepository.GetResumeById(resumeId);
-        if (resume is null && vacancy is null)
+        var vacancy = await _vacancyRepository.GetByIdAsync(vacancyId);
+
+        if (resume is null || vacancy is null)
         {
             throw new NotFoundException("Vacancy and Resume not found");
         }
@@ -30,48 +31,144 @@ public class StatisticService(IUnitOfWork unitOfWork) : IStatisticService
 
         var education = resume?.Educations.FirstOrDefault(); //fix for multiple educations
         var educationStatistics = CalculateEducationStatistics(vacancy.EducationsRequirement, education);
-        statisticsResult.EducationMatchPercent = educationStatistics.ExperienceMatchPercent;
-        statisticsResult.EducationSummary = educationStatistics.ExperienceSummary;
+        statisticsResult.EducationMatchPercent = educationStatistics.EducationMatchPercent;
+        statisticsResult.EducationSummary = educationStatistics.EducationSummary;
 
-        var languageLevel = CalculateLanguageLevelStatistics(vacancy.LanguageLevelRequirements,resume.LanguageLevels);
+        var languageLevelStatistics =
+            CalculateLanguageLevelStatistics(vacancy.LanguageLevelRequirements, resume.LanguageLevels);
+        statisticsResult.LanguageSummary = languageLevelStatistics.LanguageLevelSummary;
+        statisticsResult.LanguageMatchPercent = languageLevelStatistics.MatchPercent;
 
+        var experienceStatistics =
+            CalculateJobExperienceStatistics(vacancy.JobExperienceRequirement, resume.JobExperiences.FirstOrDefault());
+        statisticsResult.ExperienceSummary = experienceStatistics.ExperienceSummary;
+        statisticsResult.ExperienceMatchPercent = experienceStatistics.ExperienceMatchPercent;
+
+        var totalStatistics =
+            CalculateTotalStatistics(experienceStatistics, languageLevelStatistics, educationStatistics);
+        statisticsResult.Summary = totalStatistics.SummaryDto.Adapt<StatisticsSummary>();
+        statisticsResult.TotalMatchPercent = totalStatistics.TotalMatchPercent;
         return statisticsResult.Adapt<StatisticResponseDto>();
     }
 
-    private LanguageLevelStatistics CalculateLanguageLevelStatistics(ICollection<LanguageLevelRequirement> languageLevelRequirements, ICollection<LanguageLevel> resumeLanguageLevels)
+    private TotalStatistics CalculateTotalStatistics(ExperienceStatistics experienceStatistics,
+        LanguageLevelStatistics languageLevelStatistics, EducationStatistics educationStatistics)
+    {
+
+        var result = new TotalStatistics();
+        
+        var totalPercent = (languageLevelStatistics.MatchPercent + experienceStatistics.ExperienceMatchPercent +
+                           educationStatistics.EducationMatchPercent)/3;
+        
+        result.TotalMatchPercent = totalPercent;
+        result.SummaryDto = new StatisticsSummaryDto
+        {
+            EducationSummary = educationStatistics.EducationSummary,
+            ExperienceSummary = experienceStatistics.ExperienceSummary,
+            LanguageLevelSummary = languageLevelStatistics.LanguageLevelSummary,
+            TotalSummary =  result.TotalMatchPercent switch
+            {
+                0.0 => "Unfortunately candidate doesnt match any of the crucial parameters",
+                < 0.5 =>
+                    "Candidate matches some of the crucial parameters, you can check summary for each of the parameters to decide",
+                < 1.0 =>
+                    "Candidate matches most of the crucial parameters,you can check summary for each of the parameters to decide. We would recommend this candidate for an interview",
+                _ => "Error"
+            }
+        };
+
+        return result;
+    }
+
+    private ExperienceStatistics CalculateJobExperienceStatistics(
+        JobExperienceRequirement vacancyJobExperienceRequirement, JobExperience jobExperience)
+    {
+        var result = new ExperienceStatistics();
+
+        var required = vacancyJobExperienceRequirement.TechnologyRequirements.ToList();
+        var provided = jobExperience.Technologies.ToList();
+
+        var matchedPairs = required.Join(
+            provided,
+            req => req.TechnologyType.Name,
+            prov => prov.TechnologyType.Name,
+            (req, prov) => new { Required = req, Provided = prov }
+        ).ToList();
+
+        if (!matchedPairs.Any())
+        {
+            result.ExperienceMatchPercent = 0.0;
+            result.ExperienceSummary = "No required technology experiences specified";
+            return result;
+        }
+
+        var partialScores = matchedPairs.Select(x =>
+        {
+            double reqYears = x.Required.YearsOfExperience;
+            double provYears = x.Provided.YearsOfExperience;
+
+            if (reqYears <= 0)
+                return 1.25;
+
+            double ratio = provYears / reqYears;
+
+            return Math.Min(ratio, 1.25);
+        }).ToList();
+
+        result.ExperienceMatchPercent = partialScores.Average();
+        result.ExperienceSummary = result.ExperienceMatchPercent switch
+        {
+            0.0 => "Candidate does not match required experience.",
+            < 0.5 => "Candidate meets experience requirements poorly.",
+            < 1.0 => "Candidate meets most experience requirements.",
+            1.0 => "Candidate fully meets all experience requirements.",
+            > 1.0 => "Candidate exceeds experience requirements.",
+            _ => result.ExperienceSummary
+        };
+        return result;
+    }
+
+    private LanguageLevelStatistics CalculateLanguageLevelStatistics(
+        ICollection<LanguageLevelRequirement> languageLevelRequirements,
+        ICollection<LanguageLevel> resumeLanguageLevels)
     {
         var result = new LanguageLevelStatistics();
 
-       var requiredLanguages = languageLevelRequirements.ToList();
-       var languages = resumeLanguageLevels.ToList();
-       var totalRequired = requiredLanguages.Count;
-       var matched = requiredLanguages.Count(req =>
-           languages.Any(c => c.Language == req.Language && c.Level == req.Level));
-       result.MatchPercent = (double)matched / totalRequired;
-       switch (result.MatchPercent)
-       {
-           case 0.0:
-               result.Summary = "Candidate does not match required Languages";
-               break;
-           case < 0.5:
-               result.Summary = $"Candidate matches poorly required Languages, only {matched} matched ";
-               break;
-           case < 1.0:
-               result.Summary = $"Candidate matches greatly required Languages, {matched} languages matched , but not all";
-               break;
-           case 1.0:
-               result.Summary = $"Candidate matches perfectly required Languages, all languages matched";
-               break;
-       }
+        var required = languageLevelRequirements.ToList();
+        var provided = resumeLanguageLevels.ToList();
 
-       return result;
+        var totalRequired = required.Count;
+
+        if (totalRequired == 0)
+        {
+            result.MatchPercent = 0.0; /// 0 ?
+            result.LanguageLevelSummary = "No required languages specified";
+            return result;
+        }
+
+        var matched = required.Count(req =>
+            provided.Any(c => c.Language == req.Language && c.Level == req.Level));
+
+        result.MatchPercent = (double)matched / totalRequired;
+
+        result.LanguageLevelSummary = result.MatchPercent switch
+        {
+            0.0 => "Candidate does not match required languages.",
+            < 0.5 => $"Candidate matches poorly: only {matched} languages matched.",
+            < 1.0 => $"Candidate matches well: {matched} languages matched (not all).",
+            1.0 => "Candidate matches all required languages perfectly.",
+            _ => result.LanguageLevelSummary
+        };
+
+        return result;
     }
 
-    private ExperienceStatistics CalculateEducationStatistics(
+
+    private EducationStatistics CalculateEducationStatistics(
         EducationRequirement requirement,
         Education candidate)
     {
-        var result = new ExperienceStatistics();
+        var result = new EducationStatistics();
         var candidateType = (int)candidate.EducationType;
         var requiredType = (int)requirement.EducationType;
         var candidateDegree = (int)candidate.Degree!;
@@ -79,38 +176,38 @@ public class StatisticService(IUnitOfWork unitOfWork) : IStatisticService
 
         if (candidateType < requiredType)
         {
-            result.ExperienceMatchPercent = 0.0;
-            result.ExperienceSummary =
+            result.EducationMatchPercent = 0.0;
+            result.EducationSummary =
                 $"Candidate education is critically below required: {candidate.EducationType} ({candidate.Degree}) vs required {requirement.EducationType}.";
             return result;
         }
 
         if (candidate.EducationType != EducationType.University)
         {
-            result.ExperienceMatchPercent = 1.0;
-            result.ExperienceSummary =
+            result.EducationMatchPercent = 1.0;
+            result.EducationSummary =
                 $"Candidate perfectly matches education requirement ({candidate.EducationType}).";
             return result;
         }
 
         if (candidateDegree < requiredDegree)
         {
-            result.ExperienceMatchPercent = 0.5;
-            result.ExperienceSummary =
+            result.EducationMatchPercent = 0.5;
+            result.EducationSummary =
                 $"Candidate education is below required: {candidate.EducationType} ({candidate.Degree}) vs required {requirement.EducationType} ({requirement.Degree}).";
             return result;
         }
 
         if (candidateDegree == requiredDegree)
         {
-            result.ExperienceMatchPercent = 1.0;
-            result.ExperienceSummary =
+            result.EducationMatchPercent = 1.0;
+            result.EducationSummary =
                 $"Candidate perfectly matches education requirement ({candidate.EducationType}, {candidate.Degree}).";
             return result;
         }
 
-        result.ExperienceMatchPercent = 1.5;
-        result.ExperienceSummary =
+        result.EducationMatchPercent = 1.5;
+        result.EducationSummary =
             $"Candidate exceeds education requirement: {candidate.EducationType} ({candidate.Degree}) vs required {requirement.EducationType} ({requirement.Degree}).";
         return result;
     }

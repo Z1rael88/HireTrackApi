@@ -315,10 +315,6 @@ namespace Infrastructure.Migrations
                     b.Property<int>("JobExperienceRequirementId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<int>("TechnologyTypeId")
                         .HasColumnType("integer");
 
