@@ -14,6 +14,8 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
     private readonly IRepository<Resume> _repository = unitOfWork.Repository<Resume>();
     private readonly IRepository<VacancyResume> _vacancyResumeRepository = unitOfWork.Repository<VacancyResume>();
     private readonly IResumeRepository _resumeRepository = unitOfWork.Resumes;
+    private readonly IRepository<Candidate> _candidateRepository = unitOfWork.Repository<Candidate>();
+
 
     public async Task<ResumeResponseDto?> CreateResumeAsync(ResumeRequestDto dto)
     {
@@ -63,6 +65,7 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
         if ( user is not null)
         {
             resume.Candidate.UserId = user.Id;
+            await _candidateRepository.UpdateAsync(resume.Candidate);
         }
 
         var result = createdResume.Adapt<ResumeResponseDto>();
