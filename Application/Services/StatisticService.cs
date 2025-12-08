@@ -40,7 +40,7 @@ public class StatisticService(IUnitOfWork unitOfWork) : IStatisticService
         statisticsResult.LanguageMatchPercent = languageLevelStatistics.MatchPercent;
 
         var experienceStatistics =
-            CalculateJobExperienceStatistics(vacancy.JobExperienceRequirement, resume.JobExperiences.FirstOrDefault());
+            CalculateJobExperienceStatistics(vacancy.JobExperienceRequirement, resume.JobExperiences);
         statisticsResult.ExperienceSummary = experienceStatistics.ExperienceSummary;
         statisticsResult.ExperienceMatchPercent = experienceStatistics.ExperienceMatchPercent;
 
@@ -54,19 +54,18 @@ public class StatisticService(IUnitOfWork unitOfWork) : IStatisticService
     private TotalStatistics CalculateTotalStatistics(ExperienceStatistics experienceStatistics,
         LanguageLevelStatistics languageLevelStatistics, EducationStatistics educationStatistics)
     {
-
         var result = new TotalStatistics();
-        
+
         var totalPercent = (languageLevelStatistics.MatchPercent + experienceStatistics.ExperienceMatchPercent +
-                           educationStatistics.EducationMatchPercent)/3;
-        
+                            educationStatistics.EducationMatchPercent) / 3;
+
         result.TotalMatchPercent = totalPercent;
         result.SummaryDto = new StatisticsSummaryDto
         {
             EducationSummary = educationStatistics.EducationSummary,
             ExperienceSummary = experienceStatistics.ExperienceSummary,
             LanguageLevelSummary = languageLevelStatistics.LanguageLevelSummary,
-            TotalSummary =  result.TotalMatchPercent switch
+            TotalSummary = result.TotalMatchPercent switch
             {
                 0.0 => "Unfortunately candidate doesnt match any of the crucial parameters",
                 < 0.5 =>
@@ -81,12 +80,35 @@ public class StatisticService(IUnitOfWork unitOfWork) : IStatisticService
     }
 
     private ExperienceStatistics CalculateJobExperienceStatistics(
-        JobExperienceRequirement vacancyJobExperienceRequirement, JobExperience jobExperience)
+        JobExperienceRequirement requirement,
+        IEnumerable<JobExperience> jobExperiences)
+    {
+        var list = jobExperiences.ToList();
+
+        if (!list.Any())
+            return null;
+
+        if (list.Count == 1)
+            return CalculateSingleJobExperience(requirement, list[0]);
+
+        var results = list
+            .Select(exp => CalculateSingleJobExperience(requirement, exp))
+            .ToList();
+
+        return new ExperienceStatistics
+        {
+            ExperienceMatchPercent = results.Average(r => r.ExperienceMatchPercent),
+            ExperienceSummary = "Aggregated experience across multiple roles."
+        };
+    }
+    private ExperienceStatistics CalculateSingleJobExperience(
+        JobExperienceRequirement requirement,
+        JobExperience experience)
     {
         var result = new ExperienceStatistics();
 
-        var required = vacancyJobExperienceRequirement.TechnologyRequirements.ToList();
-        var provided = jobExperience.Technologies.ToList();
+        var required = requirement.TechnologyRequirements.ToList();
+        var provided = experience.Technologies.ToList();
 
         var matchedPairs = required.Join(
             provided,
@@ -111,7 +133,6 @@ public class StatisticService(IUnitOfWork unitOfWork) : IStatisticService
                 return 1.25;
 
             double ratio = provYears / reqYears;
-
             return Math.Min(ratio, 1.25);
         }).ToList();
 
@@ -123,10 +144,12 @@ public class StatisticService(IUnitOfWork unitOfWork) : IStatisticService
             < 1.0 => "Candidate meets most experience requirements.",
             1.0 => "Candidate fully meets all experience requirements.",
             > 1.0 => "Candidate exceeds experience requirements.",
-            _ => result.ExperienceSummary
+            _ => "Unexpected result"
         };
+
         return result;
     }
+
 
     private LanguageLevelStatistics CalculateLanguageLevelStatistics(
         ICollection<LanguageLevelRequirement> languageLevelRequirements,
@@ -141,7 +164,7 @@ public class StatisticService(IUnitOfWork unitOfWork) : IStatisticService
 
         if (totalRequired == 0)
         {
-            result.MatchPercent = 0.0; /// 0 ?
+            result.MatchPercent = 0.0;
             result.LanguageLevelSummary = "No required languages specified";
             return result;
         }
