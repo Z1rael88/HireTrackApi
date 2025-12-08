@@ -32,4 +32,16 @@ public class VacancyRepository(IApplicationDbContext dbContext) : IVacancyReposi
         }
         return result;
     }
+
+    public async Task<IEnumerable<Vacancy>> GetAllVacanciesByIds(List<int> vacancyIds)
+    {
+        return await dbContext.Vacancies
+            .Where(v => vacancyIds.Contains(v.Id))
+            .Include(v => v.EducationsRequirement)
+            .Include(v => v.JobExperienceRequirement)
+            .ThenInclude(j => j.TechnologyRequirements)
+            .ThenInclude(t => t.TechnologyType)
+            .Include(v => v.LanguageLevelRequirements)
+            .ToListAsync();
+    }
 }

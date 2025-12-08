@@ -53,5 +53,12 @@ namespace Presentation.Controllers
             await vacancyService.DeleteVacancyAsync(id);
             return NoContent();
         }
+
+        [HttpGet("byUserId")]
+        public async Task<IActionResult> GetVacanciesByUserId(int userId)
+        {
+            var result = await vacancyService.GetVacanciesByUserIdAsync(userId);
+            return Ok(result);
+        }
     }
 }

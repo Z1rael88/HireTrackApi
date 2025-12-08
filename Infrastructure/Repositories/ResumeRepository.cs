@@ -55,4 +55,10 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
             .FirstOrDefaultAsync(x => x.Candidate.Email == email);
         return resume;
     }
+
+    public async Task<IEnumerable<VacancyResume>> GetAllVacancyResumesByResumeIdAsync(int resumeId)
+    {
+        return await dbContext.VacancyResumes.Where(x => x.ResumeId == resumeId).ToListAsync();
+    }
+
 }
