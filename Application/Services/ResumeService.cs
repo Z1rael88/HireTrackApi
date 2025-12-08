@@ -14,6 +14,7 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
     private readonly IRepository<Resume> _repository = unitOfWork.Repository<Resume>();
     private readonly IRepository<VacancyResume> _vacancyResumeRepository = unitOfWork.Repository<VacancyResume>();
     private readonly IResumeRepository _resumeRepository = unitOfWork.Resumes;
+    private readonly ICandidateRepository _candidateCommonRepository = unitOfWork.Candidates;
     private readonly IRepository<Candidate> _candidateRepository = unitOfWork.Repository<Candidate>();
 
 
@@ -62,9 +63,10 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
         }
 
         var user = await userManager.FindByEmailAsync(resume.Candidate.Email);
-        if ( user is not null)
+        var candidate = await _candidateCommonRepository.GetCandidateByEmailAsync(resume.Candidate.Email);
+        if ( user is not null && candidate is not null)
         {
-            resume.Candidate.UserId = user.Id;
+            candidate.UserId = user.Id;
             await _candidateRepository.UpdateAsync(resume.Candidate);
         }
 
