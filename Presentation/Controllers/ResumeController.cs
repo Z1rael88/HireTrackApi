@@ -43,7 +43,7 @@ public class ResumeController(IResumeService resumeService) : ControllerBase
         return Ok();
     }
 
-    [HttpGet("byUserId{userId}")]
+    [HttpGet("byUserId/{userId}")]
     public async Task<IActionResult> GetResumeByUserId(int userId)
     {
        var resume = await resumeService.GetResumeByUserIdAsync(userId);
