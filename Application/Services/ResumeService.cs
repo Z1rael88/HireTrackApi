@@ -99,9 +99,7 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
 
     public async Task UpdateResumeAsync(ResumeRequestDto dto, int resumeId)
     {
-        var resume = await _resumeRepository.GetResumeById(resumeId);
-        dto.Adapt(resume); 
-        await _repository.UpdateAsync(resume);
+        await _resumeRepository.UpdateResume(dto.Adapt<Resume>(),resumeId);
     }
 
     public async Task<ResumeResponseDto> GetResumeByUserIdAsync(int userId)

@@ -61,4 +61,35 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
         return await dbContext.VacancyResumes.Where(x => x.ResumeId == resumeId).ToListAsync();
     }
 
+    public async Task UpdateResume(Resume resume,int resumeId)
+    {
+            var existingResume = await dbContext.Resumes
+                .Include(x => x.LanguageLevels)
+                .Include(x => x.Educations)
+                .Include(x => x.JobExperiences)
+                .ThenInclude(j => j.Technologies)
+                .FirstOrDefaultAsync(x => x.Id == resumeId);
+
+            if (existingResume == null) throw new NotFoundException("No such resume found");
+
+            existingResume.LanguageLevels.Clear();        
+            foreach (var lang in resume.LanguageLevels)
+            {
+                existingResume.LanguageLevels.Add(lang);
+            }
+            existingResume.JobExperiences.Clear();        
+            foreach (var exp in resume.JobExperiences)
+            {
+                existingResume.JobExperiences.Add(exp);
+            }
+            
+            existingResume.Educations.Clear();        
+            foreach (var edu in resume.Educations)
+            {
+                existingResume.Educations.Add(edu);
+            }
+
+            await dbContext.SaveChangesAsync();
+
+    }
 }

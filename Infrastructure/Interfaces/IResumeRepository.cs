@@ -9,4 +9,5 @@ public interface IResumeRepository
     Task<VacancyResume> GetVacancyResumeByIds(int vacancyId, int resumeId);
     Task<Resume?> GetResumeByCandidateEmail(string email);
     Task<IEnumerable<VacancyResume>> GetAllVacancyResumesByResumeIdAsync(int resumeId);
+    Task UpdateResume(Resume resume, int resumeId);
 }
