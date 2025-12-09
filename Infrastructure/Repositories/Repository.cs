@@ -41,7 +41,7 @@ namespace Infrastructure.Repositories
         public async Task<T> GetByIdAsync(int id)
         {
             var entity = await Entities
-                .FirstOrDefaultAsync(x=>x.Id == id);
+                .FirstOrDefaultAsync(x => x.Id == id);
             if (entity == null)
             {
                 throw new NotFoundException($"Entity with {id} Id not found");
@@ -59,6 +59,7 @@ namespace Infrastructure.Repositories
             }
 
             dbContext.Remove(entity);
+            await dbContext.SaveChangesAsync();
         }
 
         public async Task<UserWithRole> GetUserWithRoleById(int userId)
