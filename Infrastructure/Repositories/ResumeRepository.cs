@@ -1,6 +1,7 @@
 using Domain.Models;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
@@ -72,7 +73,8 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
 
             if (existingResume == null) throw new NotFoundException("No such resume found");
 
-            dbContext.Resumes.Update(resume);
+            resume.Adapt(existingResume);
+            
             existingResume.LanguageLevels.Clear();        
             foreach (var lang in resume.LanguageLevels)
             {
