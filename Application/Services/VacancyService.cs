@@ -65,7 +65,7 @@ public class VacancyService(IUnitOfWork unitOfWork, IValidator<VacancyRequestDto
         
         var resume = await _resumeRepository.GetResumeByCandidateEmail(user.Email!);
         var vacancyResumes = await _resumeRepository.GetAllVacancyResumesByResumeIdAsync(resume.Id);
-        var vacancyIds = vacancyResumes.Select(x => x.Id).ToList();
+        var vacancyIds = vacancyResumes.Select(x => x.VacancyId).ToList();
         var result = await _vacancyRepository.GetAllVacanciesByIds(vacancyIds);
         return result.Adapt<IEnumerable<VacancyResponseDto>>();
     }
