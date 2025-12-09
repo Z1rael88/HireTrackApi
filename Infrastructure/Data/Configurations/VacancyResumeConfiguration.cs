@@ -9,7 +9,7 @@ public class VacancyResumeConfiguration : IEntityTypeConfiguration<VacancyResume
     public void Configure(EntityTypeBuilder<VacancyResume> builder)
     {
         builder
-            .HasKey(vr => new { vr.VacancyId, vr.ResumeId });
+            .HasKey(vr => vr.Id);
         builder.Property(x => x.Status).IsRequired();
         builder
             .HasOne(vr => vr.Vacancy)
