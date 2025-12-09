@@ -58,7 +58,7 @@ namespace Infrastructure.Repositories
                 throw new ArgumentException();
             }
 
-            await UpdateAsync(entity);
+            dbContext.Remove(entity);
         }
 
         public async Task<UserWithRole> GetUserWithRoleById(int userId)

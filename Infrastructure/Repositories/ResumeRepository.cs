@@ -72,6 +72,7 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
 
             if (existingResume == null) throw new NotFoundException("No such resume found");
 
+            dbContext.Resumes.Update(resume);
             existingResume.LanguageLevels.Clear();        
             foreach (var lang in resume.LanguageLevels)
             {
