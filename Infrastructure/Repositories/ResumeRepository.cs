@@ -62,37 +62,139 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
         return await dbContext.VacancyResumes.Where(x => x.ResumeId == resumeId).ToListAsync();
     }
 
-    public async Task UpdateResume(Resume resume,int resumeId)
+    public async Task UpdateResume(Resume resume, int resumeId)
     {
-            var existingResume = await dbContext.Resumes
-                .Include(x => x.LanguageLevels)
-                .Include(x => x.Educations)
-                .Include(x => x.JobExperiences)
-                .ThenInclude(j => j.Technologies)
-                .FirstOrDefaultAsync(x => x.Id == resumeId);
+        var existing = await dbContext.Resumes
+            .Include(r => r.LanguageLevels)
+            .Include(r => r.Educations)
+            .Include(r => r.JobExperiences)
+            .ThenInclude(j => j.Technologies)
+            .FirstOrDefaultAsync(r => r.Id == resumeId);
 
-            if (existingResume == null) throw new NotFoundException("No such resume found");
+        if (existing == null)
+            throw new NotFoundException("No such resume found");
 
-            resume.Adapt(existingResume);
-            
-            existingResume.LanguageLevels.Clear();        
-            foreach (var lang in resume.LanguageLevels)
+        existing.Adapt(resume);
+        
+        foreach (var old in existing.LanguageLevels.ToList())
+        {
+            if (!resume.LanguageLevels.Any(l => l.Id == old.Id))
+                dbContext.LanguageLevels.Remove(old);
+        }
+
+        foreach (var incoming in resume.LanguageLevels)
+        {
+            var existingLevel = existing.LanguageLevels.FirstOrDefault(l => l.Id == incoming.Id);
+            if (existingLevel == null)
             {
-                existingResume.LanguageLevels.Add(lang);
+                existing.LanguageLevels.Add(new LanguageLevel
+                {
+                    Level = incoming.Level,
+                    Language = incoming.Language
+                });
             }
-            existingResume.JobExperiences.Clear();        
-            foreach (var exp in resume.JobExperiences)
+            else
             {
-                existingResume.JobExperiences.Add(exp);
+                existingLevel.Level = incoming.Level;
+                existingLevel.Language = incoming.Language;
             }
-            
-            existingResume.Educations.Clear();        
-            foreach (var edu in resume.Educations)
+        }
+
+        foreach (var old in existing.Educations.ToList())
+        {
+            if (!resume.Educations.Any(e => e.Id == old.Id))
+                dbContext.Educations.Remove(old);
+        }
+
+        foreach (var incoming in resume.Educations)
+        {
+            var existingEdu = existing.Educations.FirstOrDefault(e => e.Id == incoming.Id);
+            if (existingEdu == null)
             {
-                existingResume.Educations.Add(edu);
+                existing.Educations.Add(new Education
+                {
+                    Title = incoming.Title,
+                    Degree = incoming.Degree,
+                    Description = incoming.Description,
+                    StartDate = incoming.StartDate,
+                    EndDate = incoming.EndDate,
+                    EducationType = incoming.EducationType
+                });
             }
+            else
+            {
+                existingEdu.Title = incoming.Title;
+                existingEdu.Degree = incoming.Degree;
+                existingEdu.Description = incoming.Description;
+                existingEdu.StartDate = incoming.StartDate;
+                existingEdu.EndDate = incoming.EndDate;
+                existingEdu.EducationType = incoming.EducationType;
+            }
+        }
 
-            await dbContext.SaveChangesAsync();
+        foreach (var old in existing.JobExperiences.ToList())
+        {
+            if (!resume.JobExperiences.Any(j => j.Id == old.Id))
+                dbContext.JobExperiences.Remove(old);
+        }
 
+        foreach (var incoming in resume.JobExperiences)
+        {
+            var existingJob = existing.JobExperiences.FirstOrDefault(j => j.Id == incoming.Id);
+            if (existingJob == null)
+            {
+                var newJob = new JobExperience
+                {
+                    NameOfCompany = incoming.NameOfCompany,
+                    StartDate = incoming.StartDate,
+                    EndDate = incoming.EndDate,
+                    Description = incoming.Description,
+                    Technologies = incoming.Technologies
+                        .Select(t => new Technology
+                        {
+                            TechnologyType = t.TechnologyType,
+                            TechnologyTypeId = t.TechnologyTypeId,
+                            YearsOfExperience = t.YearsOfExperience
+                        }).ToList()
+                };
+                existing.JobExperiences.Add(newJob);
+            }
+            else
+            {
+                existingJob.NameOfCompany = incoming.NameOfCompany;
+                existingJob.StartDate = incoming.StartDate;
+                existingJob.EndDate = incoming.EndDate;
+                existingJob.Description = incoming.Description;
+
+                // --- Update Technologies ---
+                foreach (var oldTech in existingJob.Technologies.ToList())
+                {
+                    if (!incoming.Technologies.Any(t => t.Id == oldTech.Id))
+                        dbContext.Technologies.Remove(oldTech);
+                }
+
+                foreach (var tech in incoming.Technologies)
+                {
+                    var existingTech = existingJob.Technologies.FirstOrDefault(t => t.Id == tech.Id);
+                    if (existingTech == null)
+                    {
+                        existingJob.Technologies.Add(new Technology
+                        {
+                            TechnologyType = tech.TechnologyType,
+                            TechnologyTypeId = tech.TechnologyTypeId,
+                            YearsOfExperience = tech.YearsOfExperience
+                        });
+                    }
+                    else
+                    {
+                        existingTech.TechnologyType = tech.TechnologyType;
+                        existingTech.TechnologyTypeId = tech.TechnologyTypeId;
+                        existingTech.YearsOfExperience = tech.YearsOfExperience;
+                    }
+                }
+            }
+        }
+
+        await dbContext.SaveChangesAsync();
     }
 }
