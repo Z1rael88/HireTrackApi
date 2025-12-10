@@ -65,6 +65,7 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
     public async Task UpdateResume(Resume resume, int resumeId)
     {
         var existing = await dbContext.Resumes
+            .Include(x=>x.Candidate)
             .Include(r => r.LanguageLevels)
             .Include(r => r.Educations)
             .Include(r => r.JobExperiences)
