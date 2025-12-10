@@ -166,7 +166,6 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
                 existingJob.EndDate = incoming.EndDate;
                 existingJob.Description = incoming.Description;
 
-                // --- Update Technologies ---
                 foreach (var oldTech in existingJob.Technologies.ToList())
                 {
                     if (!incoming.Technologies.Any(t => t.Id == oldTech.Id))

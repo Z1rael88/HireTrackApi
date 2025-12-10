@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services;
 
-public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmailService emailService,UserManager<User> userManager) : IResumeService
+public class ResumeService(IUnitOfWork unitOfWork,IEmailService emailService,UserManager<User> userManager) : IResumeService
 {
     private readonly IRepository<Resume> _repository = unitOfWork.Repository<Resume>();
     private readonly IRepository<VacancyResume> _vacancyResumeRepository = unitOfWork.Repository<VacancyResume>();
@@ -46,22 +46,6 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
             };
         }
         
-        /*var typeIds = createdResume.JobExperiences
-            .SelectMany(x => x.Technologies)
-            .Select(t => t.TechnologyTypeId)
-            .Distinct();
-
-        var types = await crmService.GetAllTechnologyTypes();
-        var mappedTypes = types.Adapt<IList<TechnologyType>>();
-        var matchingTypes = mappedTypes
-            .Where(tt => typeIds.Contains(tt.Id)).ToDictionary(tt => tt.Id);
-
-        foreach (var tech in createdResume.JobExperiences.SelectMany(x => x.Technologies))
-        {
-            tech.TechnologyType = matchingTypes[tech.TechnologyTypeId];
-        }
-        */
-
         var user = await userManager.FindByEmailAsync(resume.Candidate.Email);
         var candidate = await _candidateCommonRepository.GetCandidateByEmailAsync(resume.Candidate.Email);
         if ( user is not null && candidate is not null)
@@ -69,7 +53,7 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
             candidate.UserId = user.Id;
             await _candidateRepository.UpdateAsync(resume.Candidate);
         }
-
+        
         var result = createdResume.Adapt<ResumeResponseDto>();
         return result;
     }

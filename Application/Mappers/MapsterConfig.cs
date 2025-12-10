@@ -93,7 +93,9 @@ public static class MapsterConfig
             .NewConfig()
             .Map(x => x.Candidate, y => y.Candidate)
             .Map(x => x.YearsOfExperience, y => y.YearsOfExperience)
-            .Map(x => x.Educations, y => y.Educations);
+            .Map(x => x.Educations, y => y.Educations)
+            .Map(x => x.JobExperiences, y => y.JobExperiences)
+            .Map(x => x.LanguageLevels, y => y.LanguageLevels);
         TypeAdapterConfig<Resume, ResumeResponseDto>
             .NewConfig()
             .Map(x => x.Candidate, y => y.Candidate)
