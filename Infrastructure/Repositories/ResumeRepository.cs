@@ -74,7 +74,15 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
         if (existing == null)
             throw new NotFoundException("No such resume found");
 
-        resume.Adapt(existing);
+        existing.Candidate.Email = resume.Candidate.Email;
+        existing.Candidate.Firstname = resume.Candidate.Firstname;
+        existing.Candidate.Lastname = resume.Candidate.Lastname;
+        existing.Candidate.Bio = resume.Candidate.Bio;
+        existing.Candidate.Address = resume.Candidate.Address;
+        existing.Candidate.WorkType = resume.Candidate.WorkType;
+        existing.Candidate.Age = resume.Candidate.Age;
+        existing.YearsOfExperience = resume.YearsOfExperience;
+        existing.ExpectedSalary = resume.ExpectedSalary;
         
         foreach (var old in existing.LanguageLevels.ToList())
         {
