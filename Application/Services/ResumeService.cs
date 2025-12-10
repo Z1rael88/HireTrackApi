@@ -17,7 +17,6 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
     private readonly ICandidateRepository _candidateCommonRepository = unitOfWork.Candidates;
     private readonly IRepository<Candidate> _candidateRepository = unitOfWork.Repository<Candidate>();
 
-
     public async Task<ResumeResponseDto?> CreateResumeAsync(ResumeRequestDto dto)
     {
         var resume = dto.Adapt<Resume>();
@@ -47,7 +46,7 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
             };
         }
         
-        var typeIds = createdResume.JobExperiences
+        /*var typeIds = createdResume.JobExperiences
             .SelectMany(x => x.Technologies)
             .Select(t => t.TechnologyTypeId)
             .Distinct();
@@ -61,6 +60,7 @@ public class ResumeService(IUnitOfWork unitOfWork, ICrmService crmService,IEmail
         {
             tech.TechnologyType = matchingTypes[tech.TechnologyTypeId];
         }
+        */
 
         var user = await userManager.FindByEmailAsync(resume.Candidate.Email);
         var candidate = await _candidateCommonRepository.GetCandidateByEmailAsync(resume.Candidate.Email);
