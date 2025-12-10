@@ -1,7 +1,6 @@
 using Domain.Models;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;

@@ -46,7 +46,7 @@ public class VacancyService(IUnitOfWork unitOfWork, IValidator<VacancyRequestDto
 
     public async Task<IEnumerable<VacancyResponseDto>> GetAllVacanciesByCompanyIdAsync(int companyId)
     {
-        var vacancies = await _vacancyRepository.GetAllVacanciesByCompanyId(companyId);
+        var vacancies = await _vacancyRepository.GetAllVacanciesByCompanyIdAsync(companyId);
         return vacancies.Adapt<IEnumerable<VacancyResponseDto>>();
     }
 
@@ -66,7 +66,7 @@ public class VacancyService(IUnitOfWork unitOfWork, IValidator<VacancyRequestDto
         var resume = await _resumeRepository.GetResumeByCandidateEmail(user.Email!);
         var vacancyResumes = await _resumeRepository.GetAllVacancyResumesByResumeIdAsync(resume.Id);
         var vacancyIds = vacancyResumes.Select(x => x.VacancyId).ToList();
-        var result = await _vacancyRepository.GetAllVacanciesByIds(vacancyIds);
+        var result = await _vacancyRepository.GetAllVacanciesByIdsAsync(vacancyIds);
         return result.Adapt<IEnumerable<VacancyResponseDto>>();
     }
 }

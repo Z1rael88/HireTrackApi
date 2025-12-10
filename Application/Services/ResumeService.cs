@@ -16,6 +16,8 @@ public class ResumeService(IUnitOfWork unitOfWork,IEmailService emailService,Use
     private readonly IResumeRepository _resumeRepository = unitOfWork.Resumes;
     private readonly ICandidateRepository _candidateCommonRepository = unitOfWork.Candidates;
     private readonly IRepository<Candidate> _candidateRepository = unitOfWork.Repository<Candidate>();
+    private readonly IVacancyRepository _vacancyRepository = unitOfWork.Vacancies;
+
 
     public async Task<ResumeResponseDto?> CreateResumeAsync(ResumeRequestDto dto)
     {
@@ -61,7 +63,9 @@ public class ResumeService(IUnitOfWork unitOfWork,IEmailService emailService,Use
     public async Task<ResumeResponseDto> GetResumeByIdAsync(int resumeId)
     {
         var resume = await _resumeRepository.GetResumeById(resumeId);
-        return resume.Adapt<ResumeResponseDto>();
+        var result = resume.Adapt<ResumeResponseDto>();
+        result.Status = await _vacancyRepository.GetResumeStatusByResumeIdAsync(resumeId);
+        return result;
     }
 
     public async Task<IEnumerable<ResumeResponseDto>> GetAllResumesByVacancyIdAsync(int vacancyId)

@@ -1,3 +1,4 @@
+using Domain.Enums;
 using Domain.Models;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces;
@@ -7,7 +8,7 @@ namespace Infrastructure.Repositories;
 
 public class VacancyRepository(IApplicationDbContext dbContext) : IVacancyRepository
 {
-    public async Task<IEnumerable<Vacancy>> GetAllVacanciesByCompanyId(int companyId)
+    public async Task<IEnumerable<Vacancy>> GetAllVacanciesByCompanyIdAsync(int companyId)
     {
         return await dbContext.Vacancies.Where(x => x.CompanyId == companyId)
             .Include(x => x.EducationsRequirement)
@@ -33,7 +34,7 @@ public class VacancyRepository(IApplicationDbContext dbContext) : IVacancyReposi
         return result;
     }
 
-    public async Task<IEnumerable<Vacancy>> GetAllVacanciesByIds(List<int> vacancyIds)
+    public async Task<IEnumerable<Vacancy>> GetAllVacanciesByIdsAsync(List<int> vacancyIds)
     {
         return await dbContext.Vacancies
             .Where(v => vacancyIds.Contains(v.Id))
@@ -43,5 +44,10 @@ public class VacancyRepository(IApplicationDbContext dbContext) : IVacancyReposi
             .ThenInclude(t => t.TechnologyType)
             .Include(v => v.LanguageLevelRequirements)
             .ToListAsync();
+    }
+
+    public async Task<ResumeStatus> GetResumeStatusByResumeIdAsync(int resumeId)
+    {
+        return await dbContext.VacancyResumes.Where(x => x.ResumeId == resumeId).Select(x=>x.Status).FirstOrDefaultAsync();
     }
 }
