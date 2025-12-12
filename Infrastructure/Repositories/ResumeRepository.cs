@@ -58,7 +58,7 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
 
     public async Task<IEnumerable<VacancyResume>> GetAllVacancyResumesByResumeIdAsync(int resumeId)
     {
-        return await dbContext.VacancyResumes.Where(x => x.ResumeId == resumeId).ToListAsync();
+        return await dbContext.VacancyResumes.Where(x => x.ResumeId == resumeId).Include(x=>x.Vacancy).ToListAsync();
     }
 
     public async Task UpdateResume(Resume resume, int resumeId)
