@@ -52,7 +52,7 @@ public class VacancySeeder(IApplicationDbContext db, UserManager<User> userManag
             CompanyId = 1,
             YearsOfExperience = 5,
             Address = new Address { Country = "Poland", City = "Warsaw" },
-            WorkType = WorkType.OnSite,
+            WorkType = new List<WorkType>{WorkType.OnSite},
             Responsibilities = "Projektowanie i rozwój usług backendowych w oparciu o .NET 6/7/8; ...",
             LanguageLevelRequirements = new List<LanguageLevelRequirement>
             {
@@ -85,7 +85,7 @@ public class VacancySeeder(IApplicationDbContext db, UserManager<User> userManag
             CompanyId = 1,
             YearsOfExperience = 5,
             Address = new Address { Country = "Poland", City = "Warsaw" },
-            WorkType = WorkType.Hybrid,
+            WorkType = new List<WorkType>{WorkType.Hybrid},
             Responsibilities =
                 "Projektowanie i rozwój zaawansowanych aplikacji frontendowych w oparciu o React i TypeScript; ...",
             LanguageLevelRequirements = new List<LanguageLevelRequirement>

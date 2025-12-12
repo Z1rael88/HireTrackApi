@@ -13,7 +13,7 @@ public class VacancyRequestDto
     public DateOnly AddDate { get; set; }
     public DateOnly EndDate { get; set; }
     public RequirementsDto Requirements { get; set; }
-    public required WorkType WorkType{ get; set; }
+    public required ICollection<WorkType> WorkType{ get; set; }
     public AddressDto Address { get; set; }
     public string Responsibilities { get; set; } = string.Empty;
 }

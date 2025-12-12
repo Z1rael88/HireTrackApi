@@ -1,5 +1,7 @@
+using Domain.Enums;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Data.Configurations;
@@ -20,8 +22,17 @@ public class VacancyConfiguration
         builder.Property(x => x.AddDate).IsRequired();
         builder.Property(x => x.EndDate).IsRequired();
         builder.Property(a => a.Salary) .IsRequired();
-        builder.Property(x => x.YearsOfExperience).IsRequired();
-        builder.Property(x => x.WorkType).IsRequired();
+        builder.Property(x => x.WorkType)
+            .HasConversion(
+                v => v.Select(x => (int)x).ToArray(),
+                v => v.Select(x => (WorkType)x).ToList()
+            )
+            .Metadata.SetValueComparer(
+                new ValueComparer<List<WorkType>>(
+                    (c1, c2) => c1.SequenceEqual(c2),
+                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    c => c.ToList()
+                ));
         builder.Property(x => x.Responsibilities).IsRequired();
 
         builder.HasOne(x=>x.Hr)

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250404092804_UserFix")]
-    partial class UserFix
+    [Migration("20251212205909_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,51 @@ namespace Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Domain.Models.Candidate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Age")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Bio")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Firstname")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Lastname")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<int[]>("WorkType")
+                        .IsRequired()
+                        .HasColumnType("integer[]");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Candidates");
+                });
 
             modelBuilder.Entity("Domain.Models.Company", b =>
                 {
@@ -88,6 +133,31 @@ namespace Infrastructure.Migrations
                     b.ToTable("Educations");
                 });
 
+            modelBuilder.Entity("Domain.Models.EducationRequirement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Degree")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("EducationType")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("VacancyId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VacancyId")
+                        .IsUnique();
+
+                    b.ToTable("EducationRequirement");
+                });
+
             modelBuilder.Entity("Domain.Models.JobExperience", b =>
                 {
                     b.Property<int>("Id")
@@ -121,7 +191,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("JobExperiences");
                 });
 
-            modelBuilder.Entity("Domain.Models.Language", b =>
+            modelBuilder.Entity("Domain.Models.JobExperienceRequirement", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -129,16 +199,63 @@ namespace Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("LanguageLevel")
+                    b.Property<int>("VacancyId")
                         .HasColumnType("integer");
-
-                    b.Property<string>("LanguageName")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Languages");
+                    b.HasIndex("VacancyId")
+                        .IsUnique();
+
+                    b.ToTable("JobExperienceRequirement");
+                });
+
+            modelBuilder.Entity("Domain.Models.LanguageLevel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Language")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ResumeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ResumeId");
+
+                    b.ToTable("LanguageLevels");
+                });
+
+            modelBuilder.Entity("Domain.Models.LanguageLevelRequirement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Language")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("VacancyId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VacancyId");
+
+                    b.ToTable("LanguageLevelRequirement");
                 });
 
             modelBuilder.Entity("Domain.Models.Resume", b =>
@@ -149,20 +266,11 @@ namespace Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Bio")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<int?>("CandidateId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Firstname")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Lastname")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("ExpectedSalary")
+                        .HasColumnType("integer");
 
                     b.Property<int>("YearsOfExperience")
                         .HasColumnType("integer");
@@ -172,21 +280,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("CandidateId");
 
                     b.ToTable("Resumes");
-                });
-
-            modelBuilder.Entity("Domain.Models.ResumeLanguage", b =>
-                {
-                    b.Property<int>("ResumeId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("LanguageId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("ResumeId", "LanguageId");
-
-                    b.HasIndex("LanguageId");
-
-                    b.ToTable("ResumeLanguages");
                 });
 
             modelBuilder.Entity("Domain.Models.Technology", b =>
@@ -215,6 +308,32 @@ namespace Infrastructure.Migrations
                     b.ToTable("Technologies");
                 });
 
+            modelBuilder.Entity("Domain.Models.TechnologyRequirement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("JobExperienceRequirementId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TechnologyTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("YearsOfExperience")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobExperienceRequirementId");
+
+                    b.HasIndex("TechnologyTypeId");
+
+                    b.ToTable("TechnologyRequirement");
+                });
+
             modelBuilder.Entity("Domain.Models.TechnologyType", b =>
                 {
                     b.Property<int>("Id")
@@ -235,6 +354,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("TechnologyTypes");
                 });
@@ -344,10 +466,6 @@ namespace Infrastructure.Migrations
                     b.Property<int>("CompanyId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("CompanyName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(250)
@@ -364,8 +482,19 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(70)
                         .HasColumnType("character varying(70)");
 
+                    b.Property<string>("Responsibilities")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<decimal>("Salary")
                         .HasColumnType("numeric");
+
+                    b.Property<int[]>("WorkType")
+                        .IsRequired()
+                        .HasColumnType("integer[]");
+
+                    b.Property<int>("YearsOfExperience")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -373,10 +502,33 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("HrId");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
                     b.ToTable("Vacancies");
+                });
+
+            modelBuilder.Entity("Domain.Models.VacancyResume", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ResumeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("VacancyId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ResumeId");
+
+                    b.HasIndex("VacancyId");
+
+                    b.ToTable("VacancyResumes");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
@@ -511,11 +663,55 @@ namespace Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Models.Candidate", b =>
+                {
+                    b.HasOne("Domain.Models.User", "User")
+                        .WithOne()
+                        .HasForeignKey("Domain.Models.Candidate", "UserId");
+
+                    b.OwnsOne("Domain.Models.Address", "Address", b1 =>
+                        {
+                            b1.Property<int>("CandidateId")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("City");
+
+                            b1.Property<string>("Country")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("Country");
+
+                            b1.HasKey("CandidateId");
+
+                            b1.ToTable("Candidates");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CandidateId");
+                        });
+
+                    b.Navigation("Address")
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Models.Education", b =>
                 {
                     b.HasOne("Domain.Models.Resume", null)
                         .WithMany("Educations")
                         .HasForeignKey("ResumeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Models.EducationRequirement", b =>
+                {
+                    b.HasOne("Domain.Models.Vacancy", null)
+                        .WithOne("EducationsRequirement")
+                        .HasForeignKey("Domain.Models.EducationRequirement", "VacancyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -527,32 +723,40 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ResumeId");
                 });
 
+            modelBuilder.Entity("Domain.Models.JobExperienceRequirement", b =>
+                {
+                    b.HasOne("Domain.Models.Vacancy", null)
+                        .WithOne("JobExperienceRequirement")
+                        .HasForeignKey("Domain.Models.JobExperienceRequirement", "VacancyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Models.LanguageLevel", b =>
+                {
+                    b.HasOne("Domain.Models.Resume", null)
+                        .WithMany("LanguageLevels")
+                        .HasForeignKey("ResumeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Models.LanguageLevelRequirement", b =>
+                {
+                    b.HasOne("Domain.Models.Vacancy", null)
+                        .WithMany("LanguageLevelRequirements")
+                        .HasForeignKey("VacancyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Domain.Models.Resume", b =>
                 {
-                    b.HasOne("Domain.Models.User", "Candidate")
+                    b.HasOne("Domain.Models.Candidate", "Candidate")
                         .WithMany()
                         .HasForeignKey("CandidateId");
 
                     b.Navigation("Candidate");
-                });
-
-            modelBuilder.Entity("Domain.Models.ResumeLanguage", b =>
-                {
-                    b.HasOne("Domain.Models.Language", "Language")
-                        .WithMany("ResumeLanguages")
-                        .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.Resume", "Resume")
-                        .WithMany("ResumeLanguages")
-                        .HasForeignKey("ResumeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Language");
-
-                    b.Navigation("Resume");
                 });
 
             modelBuilder.Entity("Domain.Models.Technology", b =>
@@ -572,10 +776,29 @@ namespace Infrastructure.Migrations
                     b.Navigation("TechnologyType");
                 });
 
+            modelBuilder.Entity("Domain.Models.TechnologyRequirement", b =>
+                {
+                    b.HasOne("Domain.Models.JobExperienceRequirement", "JobExperienceRequirement")
+                        .WithMany("TechnologyRequirements")
+                        .HasForeignKey("JobExperienceRequirementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Models.TechnologyType", "TechnologyType")
+                        .WithMany()
+                        .HasForeignKey("TechnologyTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("JobExperienceRequirement");
+
+                    b.Navigation("TechnologyType");
+                });
+
             modelBuilder.Entity("Domain.Models.Vacancy", b =>
                 {
                     b.HasOne("Domain.Models.Company", "Company")
-                        .WithMany()
+                        .WithMany("Vacancies")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -586,9 +809,54 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.OwnsOne("Domain.Models.Address", "Address", b1 =>
+                        {
+                            b1.Property<int>("VacancyId")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("City");
+
+                            b1.Property<string>("Country")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("Country");
+
+                            b1.HasKey("VacancyId");
+
+                            b1.ToTable("Vacancies");
+
+                            b1.WithOwner()
+                                .HasForeignKey("VacancyId");
+                        });
+
+                    b.Navigation("Address")
+                        .IsRequired();
+
                     b.Navigation("Company");
 
                     b.Navigation("Hr");
+                });
+
+            modelBuilder.Entity("Domain.Models.VacancyResume", b =>
+                {
+                    b.HasOne("Domain.Models.Resume", "Resume")
+                        .WithMany("VacancyResumes")
+                        .HasForeignKey("ResumeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Models.Vacancy", "Vacancy")
+                        .WithMany("VacancyResumes")
+                        .HasForeignKey("VacancyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Resume");
+
+                    b.Navigation("Vacancy");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -642,14 +910,19 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Domain.Models.Company", b =>
+                {
+                    b.Navigation("Vacancies");
+                });
+
             modelBuilder.Entity("Domain.Models.JobExperience", b =>
                 {
                     b.Navigation("Technologies");
                 });
 
-            modelBuilder.Entity("Domain.Models.Language", b =>
+            modelBuilder.Entity("Domain.Models.JobExperienceRequirement", b =>
                 {
-                    b.Navigation("ResumeLanguages");
+                    b.Navigation("TechnologyRequirements");
                 });
 
             modelBuilder.Entity("Domain.Models.Resume", b =>
@@ -658,7 +931,22 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("JobExperiences");
 
-                    b.Navigation("ResumeLanguages");
+                    b.Navigation("LanguageLevels");
+
+                    b.Navigation("VacancyResumes");
+                });
+
+            modelBuilder.Entity("Domain.Models.Vacancy", b =>
+                {
+                    b.Navigation("EducationsRequirement")
+                        .IsRequired();
+
+                    b.Navigation("JobExperienceRequirement")
+                        .IsRequired();
+
+                    b.Navigation("LanguageLevelRequirements");
+
+                    b.Navigation("VacancyResumes");
                 });
 #pragma warning restore 612, 618
         }

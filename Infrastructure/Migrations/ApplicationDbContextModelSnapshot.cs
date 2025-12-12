@@ -52,8 +52,9 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("UserId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("WorkType")
-                        .HasColumnType("integer");
+                    b.Property<int[]>("WorkType")
+                        .IsRequired()
+                        .HasColumnType("integer[]");
 
                     b.HasKey("Id");
 
@@ -485,8 +486,9 @@ namespace Infrastructure.Migrations
                     b.Property<decimal>("Salary")
                         .HasColumnType("numeric");
 
-                    b.Property<int>("WorkType")
-                        .HasColumnType("integer");
+                    b.Property<int[]>("WorkType")
+                        .IsRequired()
+                        .HasColumnType("integer[]");
 
                     b.Property<int>("YearsOfExperience")
                         .HasColumnType("integer");

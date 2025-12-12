@@ -36,6 +36,7 @@ namespace Infrastructure.Migrations
                     Firstname = table.Column<string>(type: "character varying(25)", maxLength: 25, nullable: false),
                     Lastname = table.Column<string>(type: "character varying(25)", maxLength: 25, nullable: false),
                     Age = table.Column<int>(type: "integer", nullable: false),
+                    CompanyId = table.Column<int>(type: "integer", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
@@ -57,17 +58,18 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Languages",
+                name: "Companies",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    LanguageName = table.Column<string>(type: "text", nullable: false),
-                    LanguageLevel = table.Column<int>(type: "integer", nullable: false)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    BusinessDomain = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Languages", x => x.Id);
+                    table.PrimaryKey("PK_Companies", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -192,23 +194,27 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Resumes",
+                name: "Candidates",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Firstname = table.Column<string>(type: "text", nullable: false),
                     Lastname = table.Column<string>(type: "text", nullable: false),
-                    CandidateId = table.Column<int>(type: "integer", nullable: true),
                     Bio = table.Column<string>(type: "text", nullable: false),
-                    YearsOfExperience = table.Column<int>(type: "integer", nullable: false)
+                    Age = table.Column<int>(type: "integer", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Country = table.Column<string>(type: "text", nullable: false),
+                    City = table.Column<string>(type: "text", nullable: false),
+                    WorkType = table.Column<int[]>(type: "integer[]", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Resumes", x => x.Id);
+                    table.PrimaryKey("PK_Candidates", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Resumes_AspNetUsers_CandidateId",
-                        column: x => x.CandidateId,
+                        name: "FK_Candidates_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                 });
@@ -224,7 +230,13 @@ namespace Infrastructure.Migrations
                     Salary = table.Column<decimal>(type: "numeric", nullable: false),
                     AddDate = table.Column<DateOnly>(type: "date", nullable: false),
                     EndDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    HrId = table.Column<int>(type: "integer", nullable: false)
+                    HrId = table.Column<int>(type: "integer", nullable: false),
+                    CompanyId = table.Column<int>(type: "integer", nullable: false),
+                    YearsOfExperience = table.Column<int>(type: "integer", nullable: false),
+                    Country = table.Column<string>(type: "text", nullable: false),
+                    City = table.Column<string>(type: "text", nullable: false),
+                    WorkType = table.Column<int[]>(type: "integer[]", nullable: false),
+                    Responsibilities = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -233,6 +245,93 @@ namespace Infrastructure.Migrations
                         name: "FK_Vacancies_AspNetUsers_HrId",
                         column: x => x.HrId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Vacancies_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Resumes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CandidateId = table.Column<int>(type: "integer", nullable: true),
+                    YearsOfExperience = table.Column<int>(type: "integer", nullable: false),
+                    ExpectedSalary = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Resumes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Resumes_Candidates_CandidateId",
+                        column: x => x.CandidateId,
+                        principalTable: "Candidates",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EducationRequirement",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    EducationType = table.Column<int>(type: "integer", nullable: false),
+                    Degree = table.Column<int>(type: "integer", nullable: false),
+                    VacancyId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EducationRequirement", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EducationRequirement_Vacancies_VacancyId",
+                        column: x => x.VacancyId,
+                        principalTable: "Vacancies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "JobExperienceRequirement",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    VacancyId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JobExperienceRequirement", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_JobExperienceRequirement_Vacancies_VacancyId",
+                        column: x => x.VacancyId,
+                        principalTable: "Vacancies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LanguageLevelRequirement",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Language = table.Column<int>(type: "integer", nullable: false),
+                    Level = table.Column<int>(type: "integer", nullable: false),
+                    VacancyId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LanguageLevelRequirement", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LanguageLevelRequirement_Vacancies_VacancyId",
+                        column: x => x.VacancyId,
+                        principalTable: "Vacancies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -285,25 +384,76 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ResumeLanguages",
+                name: "LanguageLevels",
                 columns: table => new
                 {
-                    ResumeId = table.Column<int>(type: "integer", nullable: false),
-                    LanguageId = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Language = table.Column<int>(type: "integer", nullable: false),
+                    Level = table.Column<int>(type: "integer", nullable: false),
+                    ResumeId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ResumeLanguages", x => new { x.ResumeId, x.LanguageId });
+                    table.PrimaryKey("PK_LanguageLevels", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ResumeLanguages_Languages_LanguageId",
-                        column: x => x.LanguageId,
-                        principalTable: "Languages",
+                        name: "FK_LanguageLevels_Resumes_ResumeId",
+                        column: x => x.ResumeId,
+                        principalTable: "Resumes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VacancyResumes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    VacancyId = table.Column<int>(type: "integer", nullable: false),
+                    ResumeId = table.Column<int>(type: "integer", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VacancyResumes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_VacancyResumes_Resumes_ResumeId",
+                        column: x => x.ResumeId,
+                        principalTable: "Resumes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ResumeLanguages_Resumes_ResumeId",
-                        column: x => x.ResumeId,
-                        principalTable: "Resumes",
+                        name: "FK_VacancyResumes_Vacancies_VacancyId",
+                        column: x => x.VacancyId,
+                        principalTable: "Vacancies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TechnologyRequirement",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    YearsOfExperience = table.Column<int>(type: "integer", nullable: false),
+                    TechnologyTypeId = table.Column<int>(type: "integer", nullable: false),
+                    JobExperienceRequirementId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TechnologyRequirement", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TechnologyRequirement_JobExperienceRequirement_JobExperienc~",
+                        column: x => x.JobExperienceRequirementId,
+                        principalTable: "JobExperienceRequirement",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TechnologyRequirement_TechnologyTypes_TechnologyTypeId",
+                        column: x => x.TechnologyTypeId,
+                        principalTable: "TechnologyTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -385,9 +535,33 @@ namespace Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Candidates_Email",
+                table: "Candidates",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Candidates_UserId",
+                table: "Candidates",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EducationRequirement_VacancyId",
+                table: "EducationRequirement",
+                column: "VacancyId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Educations_ResumeId",
                 table: "Educations",
                 column: "ResumeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JobExperienceRequirement_VacancyId",
+                table: "JobExperienceRequirement",
+                column: "VacancyId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_JobExperiences_ResumeId",
@@ -395,9 +569,14 @@ namespace Infrastructure.Migrations
                 column: "ResumeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ResumeLanguages_LanguageId",
-                table: "ResumeLanguages",
-                column: "LanguageId");
+                name: "IX_LanguageLevelRequirement_VacancyId",
+                table: "LanguageLevelRequirement",
+                column: "VacancyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LanguageLevels_ResumeId",
+                table: "LanguageLevels",
+                column: "ResumeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Resumes_CandidateId",
@@ -415,15 +594,40 @@ namespace Infrastructure.Migrations
                 column: "TechnologyTypeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TechnologyRequirement_JobExperienceRequirementId",
+                table: "TechnologyRequirement",
+                column: "JobExperienceRequirementId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TechnologyRequirement_TechnologyTypeId",
+                table: "TechnologyRequirement",
+                column: "TechnologyTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TechnologyTypes_Name",
+                table: "TechnologyTypes",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vacancies_CompanyId",
+                table: "Vacancies",
+                column: "CompanyId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Vacancies_HrId",
                 table: "Vacancies",
                 column: "HrId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Vacancies_Name",
-                table: "Vacancies",
-                column: "Name",
-                unique: true);
+                name: "IX_VacancyResumes_ResumeId",
+                table: "VacancyResumes",
+                column: "ResumeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VacancyResumes_VacancyId",
+                table: "VacancyResumes",
+                column: "VacancyId");
         }
 
         /// <inheritdoc />
@@ -445,31 +649,49 @@ namespace Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "EducationRequirement");
+
+            migrationBuilder.DropTable(
                 name: "Educations");
 
             migrationBuilder.DropTable(
-                name: "ResumeLanguages");
+                name: "LanguageLevelRequirement");
+
+            migrationBuilder.DropTable(
+                name: "LanguageLevels");
 
             migrationBuilder.DropTable(
                 name: "Technologies");
 
             migrationBuilder.DropTable(
-                name: "Vacancies");
+                name: "TechnologyRequirement");
+
+            migrationBuilder.DropTable(
+                name: "VacancyResumes");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Languages");
+                name: "JobExperiences");
 
             migrationBuilder.DropTable(
-                name: "JobExperiences");
+                name: "JobExperienceRequirement");
 
             migrationBuilder.DropTable(
                 name: "TechnologyTypes");
 
             migrationBuilder.DropTable(
                 name: "Resumes");
+
+            migrationBuilder.DropTable(
+                name: "Vacancies");
+
+            migrationBuilder.DropTable(
+                name: "Candidates");
+
+            migrationBuilder.DropTable(
+                name: "Companies");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

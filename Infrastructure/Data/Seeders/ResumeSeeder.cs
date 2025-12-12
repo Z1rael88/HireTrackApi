@@ -31,7 +31,7 @@ public class ResumeSeeder(IApplicationDbContext db)
                     Country = "Poland",
                     City = "Gdansk"
                 },
-                WorkType = WorkType.Hybrid
+                WorkType = new List<WorkType> { WorkType.Hybrid, WorkType.Remote },
             },
             YearsOfExperience = 5,
             ExpectedSalary = 24000,
