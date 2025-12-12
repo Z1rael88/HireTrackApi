@@ -96,4 +96,9 @@ public class VacancyService(
         });
     }
 
+    public async Task<IEnumerable<VacancyResponseDto>> GetByHrIdAsync(int hrId)
+    {
+        var vacancy = await _vacancyRepository.GetByHrIdAsync(hrId);
+        return vacancy.Adapt<IEnumerable<VacancyResponseDto>>();
+    }
 }

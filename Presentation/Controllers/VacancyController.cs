@@ -60,5 +60,12 @@ namespace Presentation.Controllers
             var result = await vacancyService.GetVacanciesByUserIdAsync(userId);
             return Ok(result);
         }
+        
+        [HttpGet("byHrId")]
+        public async Task<IActionResult> GetVacanciesByHrId(int hrId)
+        {
+            var result = await vacancyService.GetByHrIdAsync(hrId);
+            return Ok(result);
+        }
     }
 }

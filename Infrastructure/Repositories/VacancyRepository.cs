@@ -33,6 +33,21 @@ public class VacancyRepository(IApplicationDbContext dbContext) : IVacancyReposi
         }
         return result;
     }
+    public async Task<IEnumerable<Vacancy>> GetByHrIdAsync(int hrId)
+    {
+        var result = await dbContext.Vacancies
+            .Where(x => x.HrId == hrId)
+            .Include(x => x.EducationsRequirement)
+            .Include(x => x.JobExperienceRequirement)
+            .ThenInclude(x => x.TechnologyRequirements)
+            .ThenInclude(x => x.TechnologyType)
+            .Include(x => x.LanguageLevelRequirements).ToListAsync();
+        if (result is null)
+        {
+            throw new NotFoundException($"Entities with hr id {hrId} not found");
+        }
+        return result;
+    }
 
     public async Task<IEnumerable<Vacancy>> GetAllVacanciesByIdsAsync(List<int> vacancyIds)
     {

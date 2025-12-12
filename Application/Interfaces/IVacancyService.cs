@@ -11,4 +11,5 @@ public interface IVacancyService
     Task<IEnumerable<VacancyResponseDto>> GetAllVacanciesByCompanyIdAsync(int companyId);
     Task DeleteVacancyAsync(int vacancyId);
     Task<IEnumerable<VacancyWithStatusDto>> GetVacanciesByUserIdAsync(int userId);
+    Task<IEnumerable<VacancyResponseDto>>  GetByHrIdAsync(int hrId);
 }

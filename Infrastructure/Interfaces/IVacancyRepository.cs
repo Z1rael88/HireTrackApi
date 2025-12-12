@@ -9,4 +9,5 @@ public interface IVacancyRepository
     Task<Vacancy> GetByIdAsync(int vacancyId);
     Task<IEnumerable<Vacancy>> GetAllVacanciesByIdsAsync(List<int> vacancyIds);
     Task<ResumeStatus> GetResumeStatusByResumeIdAsync(int resumeId);
+    Task<IEnumerable<Vacancy>>  GetByHrIdAsync(int hrId);
 }
