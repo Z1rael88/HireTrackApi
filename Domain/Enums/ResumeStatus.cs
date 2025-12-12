@@ -5,5 +5,6 @@ public enum ResumeStatus
     Sent,
     Pending,
     Accepted,
-    Rejected
+    Rejected,
+    NotSpecified
 }

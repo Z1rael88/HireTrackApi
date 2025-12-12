@@ -5,5 +5,6 @@ public enum LanguageLevel
     Beginner,
     Intermediate,
     UpperIntermediate,
+    Advanced,
     Native
 }

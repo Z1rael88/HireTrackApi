@@ -6,6 +6,7 @@ using Application.Validators;
 using Domain.Models;
 using FluentValidation;
 using Infrastructure.Data;
+using Infrastructure.Data.Seeders;
 using Infrastructure.Interfaces;
 using Infrastructure.Repositories;
 using Infrastructure.ValidationOptions;
@@ -32,7 +33,7 @@ builder.Services.AddIdentityCore<User>(
         {
             options.Password.RequiredUniqueChars = 2;
             options.Password.RequireUppercase = true;
-            options.Password.RequiredLength = 10;
+            options.Password.RequiredLength = 8;
         })
     .AddRoles<IdentityRole<int>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -50,10 +51,14 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IStatisticService, StatisticService>();
 builder.Services.AddScoped<ICandidateRepository, CandidateRepository>();
-builder.Services.AddSingleton<IHttpContextAccessor,HttpContextAccessor>();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 builder.Services.AddScoped<GlobalExceptionHandler>();
+builder.Services.AddScoped<DatabaseSeeder>();
+builder.Services.AddScoped<VacancySeeder>();
+builder.Services.AddScoped<CompanySeeder>();
+builder.Services.AddScoped<ResumeSeeder>();
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
 builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("SmtpOptions"));
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -76,8 +81,21 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-await RolesInitializer.InitializeRolesAsync(app.Services);
-await SystemAdministratorInitializer.InitializeSystemAdministratorAsync(app.Services, builder.Configuration);
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+    
+    await RolesInitializer.InitializeRolesAsync(app.Services);
+    await SystemAdministratorInitializer.InitializeSystemAdministratorAsync(app.Services, builder.Configuration);
+    
+    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
+    await seeder.SeedDbEntitiesAsync();
+}
+
+
 app.UseCors("AllowReactApp");
 app.UseHttpsRedirection();
 app.UseMiddleware<GlobalExceptionHandler>();
