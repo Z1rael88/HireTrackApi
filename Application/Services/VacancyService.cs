@@ -74,6 +74,7 @@ public class VacancyService(
 
         return vacancies.Select(vacancy => new VacancyWithStatusDto
         {
+            Id = vacancy.Id,
             HrId = vacancy.HrId,
             CompanyId = vacancy.CompanyId,
             Name = vacancy.Name,
