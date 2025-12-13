@@ -17,16 +17,18 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
     public async Task<UserWithCompanyResponseDto> GetUserProfileById(int userId)
     {
         var result = new UserWithCompanyResponseDto();
-        
-        var userWithRole =  await _userRepository.GetUserWithRoleById(userId);
+
+        var userWithRole = await _userRepository.GetUserWithRoleById(userId);
         result.Firstname = userWithRole.User.Firstname;
         result.Lastname = userWithRole.User.Lastname;
         result.Username = userWithRole.User.UserName;
         result.Email = userWithRole.User.Email;
         result.Id = userWithRole.User.Id;
         result.Role = Enum.Parse<Role>(userWithRole.Role);
-        if (userWithRole.CompanyId is null) return userWithRole.User.Adapt<UserWithCompanyResponseDto>();
-        var company = await _companyRepository.GetByIdAsync((int)userWithRole.CompanyId);//
+        if (userWithRole.CompanyId is null)
+            return result;
+
+        var company = await _companyRepository.GetByIdAsync((int)userWithRole.CompanyId); 
 
         result.CompanyId = company.Id;
         result.CompanyName = company.Name;
@@ -43,6 +45,7 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
         {
             throw new NotFoundException("There's no candidate or user id for candidate is null");
         }
+
         var user = await GetUserProfileById((int)candidate.UserId);
         return user;
     }
