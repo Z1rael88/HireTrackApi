@@ -96,7 +96,7 @@ public class ResumeService(IUnitOfWork unitOfWork,IEmailService emailService,Use
         if (user!.Email is null) throw new NotFoundException("No user found with that Id");
         var resume = await _resumeRepository.GetResumeByCandidateEmail(user.Email);
         var result = resume.Adapt<ResumeResponseDto>();
-        result.Status = await _vacancyRepository.GetResumeStatusByResumeIdAsync(resume.Id);
+        if (resume != null) result.Status = await _vacancyRepository.GetResumeStatusByResumeIdAsync(resume.Id);
         return result;
     }
 }

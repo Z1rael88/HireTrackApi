@@ -53,6 +53,8 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
             .ThenInclude(x => x.Technologies)
             .ThenInclude(x => x.TechnologyType)
             .FirstOrDefaultAsync(x => x.Candidate.Email == email);
+        if (resume is null)
+            throw new NotFoundException("Resume for that user not found");
         return resume;
     }
 
