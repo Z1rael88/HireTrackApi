@@ -25,6 +25,7 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
         result.Email = userWithRole.User.Email;
         result.Id = userWithRole.User.Id;
         result.Role = Enum.Parse<Role>(userWithRole.Role);
+        result.Age = userWithRole.User.Age;
         if (userWithRole.CompanyId is null)
             return result;
 
