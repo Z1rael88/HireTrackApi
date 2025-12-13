@@ -5,6 +5,7 @@ using Domain.Models;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces;
 using Mapster;
+using Microsoft.EntityFrameworkCore;
 using LanguageLevel = Domain.Models.LanguageLevel;
 using StatisticsSummary = Domain.Models.StatisticsSummary;
 
@@ -29,7 +30,7 @@ public class StatisticService(IUnitOfWork unitOfWork) : IStatisticService
         statisticsResult.VacancyId = vacancyId;
         statisticsResult.ResumeId = resumeId;
 
-        var education = resume?.Educations.FirstOrDefault(); //fix for multiple educations
+        var education = resume.Educations.FirstOrDefault(); 
         var educationStatistics = CalculateEducationStatistics(vacancy.EducationsRequirement, education);
         statisticsResult.EducationMatchPercent = educationStatistics.EducationMatchPercent;
         statisticsResult.EducationSummary = educationStatistics.EducationSummary;
@@ -45,16 +46,31 @@ public class StatisticService(IUnitOfWork unitOfWork) : IStatisticService
         statisticsResult.ExperienceMatchPercent = experienceStatistics.ExperienceMatchPercent;
 
         var totalStatistics =
-            CalculateTotalStatistics(experienceStatistics, languageLevelStatistics, educationStatistics);
+            CalculateTotalStatistics(experienceStatistics, languageLevelStatistics, educationStatistics, vacancy,resume);
         statisticsResult.Summary = totalStatistics.SummaryDto.Adapt<StatisticsSummary>();
         statisticsResult.TotalMatchPercent = totalStatistics.TotalMatchPercent;
         return statisticsResult.Adapt<StatisticResponseDto>();
     }
 
     private TotalStatistics CalculateTotalStatistics(ExperienceStatistics experienceStatistics,
-        LanguageLevelStatistics languageLevelStatistics, EducationStatistics educationStatistics)
+        LanguageLevelStatistics languageLevelStatistics, EducationStatistics educationStatistics,Vacancy vacancy, Resume resume)
     {
         var result = new TotalStatistics();
+        var workTypeMatches = resume.Candidate.WorkType
+            .Any(wt => vacancy.WorkType.Contains(wt));
+        if (!workTypeMatches)
+        {
+            result.TotalMatchPercent = 0;
+            result.SummaryDto = new StatisticsSummaryDto
+            {
+                EducationSummary = educationStatistics.EducationSummary,
+                ExperienceSummary = experienceStatistics.ExperienceSummary,
+                LanguageLevelSummary = languageLevelStatistics.LanguageLevelSummary,
+                TotalSummary = "Candidate work type does not match the vacancy requirements"
+            };
+
+            return result;
+        }
 
         var totalPercent = (languageLevelStatistics.MatchPercent + experienceStatistics.ExperienceMatchPercent +
                             educationStatistics.EducationMatchPercent) / 3;
