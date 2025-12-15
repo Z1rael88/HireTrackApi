@@ -79,8 +79,20 @@ public class ResumeService(IUnitOfWork unitOfWork, IEmailService emailService, U
     public async Task<IEnumerable<ResumeResponseDto>> GetAllResumesByVacancyIdAsync(int vacancyId)
     {
         var resumes = await _resumeRepository.GetAllResumesByVacancyId(vacancyId);
-        return resumes.Adapt<ICollection<ResumeResponseDto>>();
+
+        var statusTasks = resumes.Select(r => _vacancyRepository.GetResumeStatusByResumeIdAsync(r.Id));
+        var statuses = await Task.WhenAll(statusTasks);
+
+        var result = resumes.Adapt<List<ResumeResponseDto>>();
+
+        for (var i = 0; i < result.Count; i++)
+        {
+            result[i].Status = statuses[i];
+        }
+
+        return result;
     }
+
 
     public async Task ChangeStatusOfResumeAsync(int resumeId, int vacancyId, ResumeStatus status)
     {
