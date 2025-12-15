@@ -20,6 +20,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Company> Companies { get; set; }
     public DbSet<LanguageLevel> LanguageLevels { get; set; }
     public DbSet<Candidate> Candidates{ get; set; }
+    public DbSet<Statistics> Statistics { get; }
     public DbSet<VacancyResume> VacancyResumes { get; set; }
     public async Task<int> SaveChangesAsync()
     {

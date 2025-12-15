@@ -8,6 +8,7 @@ public interface IUnitOfWork : IDisposable
     IVacancyRepository Vacancies { get; }
     IResumeRepository Resumes { get; }
     ICandidateRepository Candidates { get; }
+    IStatisticsRepository Statistics { get; }
 
     Task SaveChangesAsync();
 }

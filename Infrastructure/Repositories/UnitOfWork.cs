@@ -11,6 +11,7 @@ namespace Infrastructure.Repositories
         private IVacancyRepository _vacancyRepository;
         private IResumeRepository _resumeRepository;
         private ICandidateRepository _candidateRepository;
+        private IStatisticsRepository _statisticsRepository;
 
 
         public IRepository<T> Repository<T>() where T : class, IBaseEntity
@@ -21,6 +22,7 @@ namespace Infrastructure.Repositories
         public IVacancyRepository Vacancies => _vacancyRepository ??= new VacancyRepository(_dbContext);
         public IResumeRepository Resumes => _resumeRepository ??= new ResumeRepository(_dbContext);
         public ICandidateRepository Candidates => _candidateRepository ??= new CandidateRepository(_dbContext);
+        public IStatisticsRepository Statistics => _statisticsRepository ??= new StatisticsRepository(_dbContext);
 
 
         public async Task SaveChangesAsync()

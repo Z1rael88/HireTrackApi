@@ -5,18 +5,19 @@ using Domain.Models;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces;
 using Mapster;
-using Microsoft.EntityFrameworkCore;
 using LanguageLevel = Domain.Models.LanguageLevel;
 using StatisticsSummary = Domain.Models.StatisticsSummary;
 
 namespace Application.Services;
 
-public class StatisticService(IUnitOfWork unitOfWork) : IStatisticService
+public class StatisticsService(IUnitOfWork unitOfWork) : IStatisticsService
 {
     private IVacancyRepository _vacancyRepository = unitOfWork.Vacancies;
     private IResumeRepository _resumeRepository = unitOfWork.Resumes;
+    private IStatisticsRepository _statisticsRepository = unitOfWork.Statistics;
+    private IRepository<Statistics> _statisticsCommonRepository = unitOfWork.Repository<Statistics>();
 
-    public async Task<StatisticResponseDto> GenerateStatisticsForResume(int vacancyId, int resumeId)
+    public async Task<StatisticsResponseDto> GenerateStatisticsForResumeAsync(int vacancyId, int resumeId)
     {
         var resume = await _resumeRepository.GetResumeById(resumeId);
         var vacancy = await _vacancyRepository.GetByIdAsync(vacancyId);
@@ -26,7 +27,7 @@ public class StatisticService(IUnitOfWork unitOfWork) : IStatisticService
             throw new NotFoundException("Vacancy and Resume not found");
         }
 
-        var statisticsResult = new Statistic();
+        var statisticsResult = new Statistics();
         statisticsResult.VacancyId = vacancyId;
         statisticsResult.ResumeId = resumeId;
 
@@ -49,7 +50,21 @@ public class StatisticService(IUnitOfWork unitOfWork) : IStatisticService
             CalculateTotalStatistics(experienceStatistics, languageLevelStatistics, educationStatistics, vacancy,resume);
         statisticsResult.Summary = totalStatistics.SummaryDto.Adapt<StatisticsSummary>();
         statisticsResult.TotalMatchPercent = totalStatistics.TotalMatchPercent;
-        return statisticsResult.Adapt<StatisticResponseDto>();
+        
+        var createdStatistics = await _statisticsCommonRepository.CreateAsync(statisticsResult);
+        return statisticsResult.Adapt<StatisticsResponseDto>();
+    }
+
+    public async Task<StatisticsResponseDto> GetStatisticsByIdAsync(int statisticsId)
+    {
+        var statistics = await _statisticsCommonRepository.GetByIdAsync(statisticsId);
+        return statistics.Adapt<StatisticsResponseDto>();
+    }
+
+    public async Task<IEnumerable<StatisticsResponseDto>> GetAllStatisticsByVacancyIdAsync(int vacancyId)
+    {
+        var statistics = await _statisticsRepository.GetAllStatisticsByVacancyId(vacancyId);
+        return statistics.Adapt<IEnumerable<StatisticsResponseDto>>();
     }
 
     private TotalStatistics CalculateTotalStatistics(ExperienceStatistics experienceStatistics,

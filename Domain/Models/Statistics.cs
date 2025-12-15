@@ -1,6 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace Domain.Models;
 
-public class Statistic : BaseEntity
+public class Statistics : BaseEntity
 {
     public double TotalMatchPercent { get; set; }
     public StatisticsSummary Summary { get; set; } 
@@ -12,5 +14,7 @@ public class Statistic : BaseEntity
     public string ExperienceSummary { get; set; } = string.Empty;
     
     public int ResumeId { get; set; }
+    public Resume Resume { get; set; }
     public int VacancyId { get; set; }
+    public Vacancy Vacancy { get; set; }
 }

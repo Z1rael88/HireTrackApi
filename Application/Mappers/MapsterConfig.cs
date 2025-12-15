@@ -81,7 +81,7 @@ public static class MapsterConfig
             .Map(x => x.Lastname, y => y.User.Lastname)
             .Map(x => x.Username, y => y.User.UserName)
             .Map(x => x.Email, y => y.User.Email);
-        TypeAdapterConfig<Statistic, StatisticResponseDto>
+        TypeAdapterConfig<Statistics, StatisticsResponseDto>
             .NewConfig()
             .Map(dest => dest.EducationStatistics.EducationSummary, src => src.EducationSummary)
             .Map(dest => dest.EducationStatistics.EducationMatchPercent, src => src.EducationMatchPercent);

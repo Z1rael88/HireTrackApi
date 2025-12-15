@@ -15,6 +15,7 @@ public interface IApplicationDbContext
     DbSet<Company> Companies { get; }
     DbSet<LanguageLevel> LanguageLevels { get; }
     DbSet<Candidate> Candidates { get; }
+    DbSet<Statistics> Statistics { get; }
     DbSet<VacancyResume> VacancyResumes { get; }
     Task<int> SaveChangesAsync();
 }
