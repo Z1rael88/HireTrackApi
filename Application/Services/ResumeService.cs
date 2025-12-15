@@ -4,6 +4,7 @@ using Application.Dtos.Resume;
 using Application.Interfaces;
 using Domain.Enums;
 using Domain.Models;
+using FluentValidation;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces;
 using Mapster;
@@ -15,7 +16,8 @@ using LanguageLevel = Domain.Enums.LanguageLevel;
 
 namespace Application.Services;
 
-public class ResumeService(IUnitOfWork unitOfWork, IEmailService emailService, UserManager<User> userManager)
+public class ResumeService(IUnitOfWork unitOfWork, 
+    IValidator<ResumeRequestDto> validator, IEmailService emailService, UserManager<User> userManager)
     : IResumeService
 {
     private readonly IRepository<Resume> _repository = unitOfWork.Repository<Resume>();
@@ -28,6 +30,7 @@ public class ResumeService(IUnitOfWork unitOfWork, IEmailService emailService, U
 
     public async Task<ResumeResponseDto?> CreateResumeAsync(ResumeRequestDto dto)
     {
+        validator.ValidateAndThrow(dto);
         var resume = dto.Adapt<Resume>();
         var existingResume = await _resumeRepository.GetResumeByCandidateEmail(resume.Candidate.Email);
         if (dto.VacancyId is not 0 && existingResume is not null)
@@ -107,6 +110,7 @@ public class ResumeService(IUnitOfWork unitOfWork, IEmailService emailService, U
 
     public async Task UpdateResumeAsync(ResumeRequestDto dto, int resumeId)
     {
+        validator.ValidateAndThrow(dto);
         await _resumeRepository.UpdateResume(dto.Adapt<Resume>(), resumeId);
     }
 

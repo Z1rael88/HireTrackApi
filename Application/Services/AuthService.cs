@@ -123,7 +123,6 @@ public class AuthService(UserManager<User> userManager, IOptions<JwtOptions> jwt
         {
             throw new IdentityException("User creation failed", userCreationResult.Errors);
         }
-            //rollback mechanism
         var roleAssignmentResult = await userManager.AddToRoleAsync(user, roleName);
         if (!roleAssignmentResult.Succeeded)
         {

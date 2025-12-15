@@ -7,4 +7,5 @@ public interface ICompanyService
     Task<CompanyResponseDto> CreateCompanyAsync(CompanyRequestDto dto);
     Task<IEnumerable<CompanyResponseDto>> GetCompaniesAsync();
     Task<CompanyResponseDto> GetCompanyByIdAsync(int companyId);
+    Task DeleteCompanyAsync(int companyId);
 }

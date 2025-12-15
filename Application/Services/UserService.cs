@@ -2,6 +2,7 @@ using Application.Dtos.User;
 using Application.Interfaces;
 using Domain.Enums;
 using Domain.Models;
+using FluentValidation;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces;
 using Mapster;

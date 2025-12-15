@@ -102,7 +102,7 @@ public class StatisticsService(IUnitOfWork unitOfWork) : IStatisticsService
                 < 0.5 =>
                     "Candidate matches some of the crucial parameters, you can check summary for each of the parameters to decide",
                 < 1.0 =>
-                    "Candidate matches most of the crucial parameters,you can check summary for each of the parameters to decide. We would recommend this candidate for an interview",
+                    "Candidate matches most of the crucial parameters, eyou can check summary for each of the parameters to decide. We would recommend this candidate for an interview",
                 _ => "Error"
             }
         };

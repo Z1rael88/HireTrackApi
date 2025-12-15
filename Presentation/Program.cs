@@ -26,6 +26,12 @@ MapsterConfig.UserMappings();
 MapsterConfig.ResumeMappings();
 
 builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<EducationValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<JobExperienceValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<TechnologyValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<LanguageLevelValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<ResumeValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<VacancyValidator>();
 builder.Services.AddSwaggerWithJwtAuthentication();
 builder.Services.AddAuthenticationWithJwtTokenSettings(builder.Configuration);
 builder.Services.AddIdentityCore<User>(

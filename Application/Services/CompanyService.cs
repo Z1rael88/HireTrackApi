@@ -6,8 +6,7 @@ using Mapster;
 
 namespace Application.Services;
 
-public class 
-    CompanyService(IUnitOfWork unitOfWork) : ICompanyService
+public class CompanyService(IUnitOfWork unitOfWork) : ICompanyService
 {
     private readonly IRepository<Company> _repository = unitOfWork.Repository<Company>();
 
@@ -28,5 +27,10 @@ public class
     {
         var company = await _repository.GetByIdAsync(companyId);
         return company.Adapt<CompanyResponseDto>();
+    }
+
+    public async Task DeleteCompanyAsync(int companyId)
+    {
+        await _repository.DeleteAsync(companyId);
     }
 }

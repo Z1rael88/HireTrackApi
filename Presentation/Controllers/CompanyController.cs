@@ -26,5 +26,11 @@ public class CompanyController(ICompanyService companyService) : ControllerBase
         var company = await companyService.GetCompanyByIdAsync(companyId);
         return Ok(company);
     }
+    [HttpDelete]
+    public async Task<IActionResult> DeleteCompany(int companyId)
+    {
+        await companyService.DeleteCompanyAsync(companyId);
+        return Ok();
+    }
     
 }

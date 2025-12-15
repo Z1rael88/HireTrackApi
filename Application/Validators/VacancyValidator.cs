@@ -19,6 +19,12 @@ public class VacancyValidator : AbstractValidator<VacancyRequestDto>
             .WithMessage("Add date is required")
             .Must(date => date >= DateOnly.FromDateTime(DateTime.Today))
             .WithMessage("Add date cannot be in the past.");
+        RuleFor(u => u.EndDate)
+            .NotEmpty()
+            .WithMessage("End date is required")
+            .Must(date => date >= DateOnly.FromDateTime(DateTime.Today))
+            .WithMessage("End date cannot be in the past.");
+
 
 
     }
