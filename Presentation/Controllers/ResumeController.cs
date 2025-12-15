@@ -49,4 +49,11 @@ public class ResumeController(IResumeService resumeService) : ControllerBase
        var resume = await resumeService.GetResumeByUserIdAsync(userId);
         return Ok(resume);
     }
+
+    [HttpPost("uploadResume")]
+    public IActionResult UploadResume(IFormFile resume)
+    {
+        var result =  resumeService.UploadResumeAsync(resume);
+        return Ok(result);
+    }
 }

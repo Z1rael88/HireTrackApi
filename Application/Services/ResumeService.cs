@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.RegularExpressions;
 using Application.Dtos.Resume;
 using Application.Interfaces;
 using Domain.Enums;
@@ -5,11 +7,16 @@ using Domain.Models;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces;
 using Mapster;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Syncfusion.Pdf;
+using Syncfusion.Pdf.Parsing;
+using LanguageLevel = Domain.Enums.LanguageLevel;
 
 namespace Application.Services;
 
-public class ResumeService(IUnitOfWork unitOfWork,IEmailService emailService,UserManager<User> userManager) : IResumeService
+public class ResumeService(IUnitOfWork unitOfWork, IEmailService emailService, UserManager<User> userManager)
+    : IResumeService
 {
     private readonly IRepository<Resume> _repository = unitOfWork.Repository<Resume>();
     private readonly IRepository<VacancyResume> _vacancyResumeRepository = unitOfWork.Repository<VacancyResume>();
@@ -27,13 +34,14 @@ public class ResumeService(IUnitOfWork unitOfWork,IEmailService emailService,Use
         {
             var vacancyResumes = new VacancyResume
             {
-                    ResumeId = existingResume.Id,
-                    VacancyId = (int)dto.VacancyId!,
-                    Status = ResumeStatus.Sent,
+                ResumeId = existingResume.Id,
+                VacancyId = (int)dto.VacancyId!,
+                Status = ResumeStatus.Sent,
             };
             await _vacancyResumeRepository.CreateAsync(vacancyResumes);
             return null;
         }
+
         var createdResume = await _repository.CreateAsync(resume);
         if (dto.VacancyId is not 0)
         {
@@ -47,15 +55,15 @@ public class ResumeService(IUnitOfWork unitOfWork,IEmailService emailService,Use
                 }
             };
         }
-        
+
         var user = await userManager.FindByEmailAsync(resume.Candidate.Email);
         var candidate = await _candidateCommonRepository.GetCandidateByEmailAsync(resume.Candidate.Email);
-        if ( user is not null && candidate is not null)
+        if (user is not null && candidate is not null)
         {
             candidate.UserId = user.Id;
             await _candidateRepository.UpdateAsync(resume.Candidate);
         }
-        
+
         var result = createdResume.Adapt<ResumeResponseDto>();
         return result;
     }
@@ -87,7 +95,7 @@ public class ResumeService(IUnitOfWork unitOfWork,IEmailService emailService,Use
 
     public async Task UpdateResumeAsync(ResumeRequestDto dto, int resumeId)
     {
-        await _resumeRepository.UpdateResume(dto.Adapt<Resume>(),resumeId);
+        await _resumeRepository.UpdateResume(dto.Adapt<Resume>(), resumeId);
     }
 
     public async Task<ResumeResponseDto> GetResumeByUserIdAsync(int userId)
@@ -98,5 +106,180 @@ public class ResumeService(IUnitOfWork unitOfWork,IEmailService emailService,Use
         var result = resume.Adapt<ResumeResponseDto>();
         if (resume != null) result.Status = await _vacancyRepository.GetResumeStatusByResumeIdAsync(resume.Id);
         return result;
+    }
+
+    public ResumeResponseDto UploadResumeAsync(IFormFile resume)
+    {
+        var pdf = new PdfLoadedDocument(resume.OpenReadStream());
+        var pages = pdf.Pages;
+        var allText = new StringBuilder();
+
+        foreach (var page in pages.Cast<PdfLoadedPage>())
+        {
+            var extractedText = page.ExtractText(true);
+            allText.AppendLine(extractedText);
+        }
+
+        return ConvertTextToResumeDto(allText.ToString());
+    }
+
+    private ResumeResponseDto ConvertTextToResumeDto(string text)
+    {
+        var resume = new ResumeResponseDto();
+        resume.Candidate = new CandidateDto
+        {
+            Email = ExtractEmail(text),
+            Firstname = ExtractFirstName(text),
+            Lastname =  ExtractLastName(text),
+            Age = ExtractAge(text),
+            Bio = ExtractBio(text),
+            WorkType = ExtractWorkType(text),
+        };
+        resume.LanguageLevels = ExtractLanguageLevel(text);
+        return resume;
+    }
+
+    private string ExtractFullName(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return string.Empty;
+
+        var lines = text
+            .Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(l => l.Trim());
+
+        var headers = new[] { "Profile", "Summary", "About Me", "Objective" };
+
+        foreach (var line in lines)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            if (headers.Any(h => line.StartsWith(h, StringComparison.OrdinalIgnoreCase)))
+                continue;
+
+            return line;
+        }
+
+        return string.Empty;
+    }
+
+    private string ExtractFirstName(string text)
+    {
+        var fullName = ExtractFullName(text);
+
+        if (string.IsNullOrWhiteSpace(fullName))
+            return string.Empty;
+
+        var parts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length > 0 ? parts[0] : string.Empty;
+    }
+
+    private string ExtractLastName(string text)
+    {
+        var fullName = ExtractFullName(text);
+
+        if (string.IsNullOrWhiteSpace(fullName))
+            return string.Empty;
+
+        var parts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length > 1 ? parts[^1] : string.Empty;
+    }
+
+    private ICollection<LanguageLevelDto> ExtractLanguageLevel(string text)
+    {
+        var match = Regex.Match(
+            text,
+            @"\bLanguages\b[\s:]*\r?\n([\s\S]*?)(?=\r?\n\b(Experience|Education|Skills|Projects|Work\s*Experience|Employment)\b|$)",
+            RegexOptions.IgnoreCase);
+
+        if (match.Success)
+        {
+            var lines = match.Groups[1].Value
+                .Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(l => l.Trim());
+
+            var languageLevels = new List<LanguageLevelDto>();
+
+            foreach (var line in lines)
+            {
+                var parts = line.Split(new[] { '–', '-' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (parts.Length != 2)
+                    continue;
+
+                if (!Enum.TryParse<Language>(parts[0].Trim(), true, out var language))
+                    continue;
+
+                var levelText = parts[1].Trim();
+                if (!Enum.TryParse<LanguageLevel>(levelText, true, out var level))
+                {
+                    level = levelText switch
+                    {
+                        "A1" => LanguageLevel.Beginner,
+                        "A2" => LanguageLevel.Beginner,
+                        "B1" => LanguageLevel.Intermediate,
+                        "B2" => LanguageLevel.Intermediate,
+                        "C1" => LanguageLevel.Advanced,
+                        "C2" => LanguageLevel.Native,
+                        _ => LanguageLevel.Beginner
+                    };
+                }
+
+                languageLevels.Add(new LanguageLevelDto
+                {
+                    Language = language,
+                    Level = level
+                });
+            }
+
+            return languageLevels;
+        }
+
+        return new List<LanguageLevelDto>();
+    }
+
+    private ICollection<WorkType> ExtractWorkType(string text)
+    {
+        return new List<WorkType>();
+    }
+
+    private string ExtractEmail(string text)
+    {
+        var match = Regex.Match(
+            text,
+            @"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}",
+            RegexOptions.IgnoreCase);
+
+        return match.Success ? match.Value : string.Empty;
+    }
+
+    private int ExtractAge(string text)
+    {
+        var match = Regex.Match(
+            text,
+            @"(?:age\s*:?|aged\s*|years\s*old\s*:?|age\s*is\s*)\s*(\d{1,2})",
+            RegexOptions.IgnoreCase | RegexOptions.Singleline);
+
+        return match.Success ? int.Parse(match.Value) : 0;
+    }
+
+    private string ExtractBio(string text)
+    {
+        var match = Regex.Match(
+            text,
+            @"\b(Profile|Summary|About\s*Me|Objective)\b[\s:]*\r?\n?([\s\S]*?)(?=\r?\n\b(Experience|Education|Skills|Projects|Work\s*Experience|Employment)\b|$)",
+            RegexOptions.IgnoreCase);
+
+        if (!match.Success)
+            return string.Empty;
+
+        var bio = match.Groups[2].Value;
+
+        bio = bio.Replace("\r", "")
+            .Replace("\n", " ")
+            .Trim();
+
+        return bio;
     }
 }
