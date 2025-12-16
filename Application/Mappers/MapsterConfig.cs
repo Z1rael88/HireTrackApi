@@ -84,7 +84,11 @@ public static class MapsterConfig
         TypeAdapterConfig<Statistics, StatisticsResponseDto>
             .NewConfig()
             .Map(dest => dest.EducationStatistics.EducationSummary, src => src.EducationSummary)
-            .Map(dest => dest.EducationStatistics.EducationMatchPercent, src => src.EducationMatchPercent);
+            .Map(dest => dest.EducationStatistics.EducationMatchPercent, src => src.EducationMatchPercent)
+            .Map(dest => dest.ExperienceStatistics.ExperienceSummary, src => src.ExperienceSummary)
+            .Map(dest => dest.ExperienceStatistics.ExperienceMatchPercent, src => src.ExperienceMatchPercent)
+            .Map(dest => dest.LanguageLevelStatistics.LanguageLevelSummary, src => src.LanguageSummary)
+            .Map(dest => dest.LanguageLevelStatistics.MatchPercent, src => src.LanguageMatchPercent);
     }
 
     public static void ResumeMappings()
