@@ -2,8 +2,8 @@ namespace Domain.Enums;
 
 public enum Language
 {
-    English,
-    Spanish,
-    Ukrainian,
-    Polish
+    English = 1,
+    Spanish = 2,
+    Ukrainian = 3,
+    Polish = 4
 }

@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace Domain.Models;
 
 public class Statistics : BaseEntity

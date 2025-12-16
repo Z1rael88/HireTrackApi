@@ -2,7 +2,7 @@ namespace Domain.Enums;
 
 public enum WorkType
 {
-    OnSite,
-    Hybrid,
-    Remote
+    OnSite = 1,
+    Hybrid = 2,
+    Remote = 3
 }

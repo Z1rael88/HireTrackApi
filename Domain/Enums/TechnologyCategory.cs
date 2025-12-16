@@ -2,6 +2,6 @@ namespace Domain.Enums;
 
 public enum TechnologyCategory
 {
-    Backend,
-    Frontend
+    Backend = 1,
+    Frontend = 2
 }

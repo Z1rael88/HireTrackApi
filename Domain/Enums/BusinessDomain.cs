@@ -2,6 +2,6 @@ namespace Domain.Enums;
 
 public enum BusinessDomain
 {
-    HealthTech,
-    Fintech
+    HealthTech = 1,
+    Fintech = 2
 }
