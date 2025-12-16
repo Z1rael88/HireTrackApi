@@ -88,7 +88,11 @@ public static class MapsterConfig
             .Map(dest => dest.ExperienceStatistics.ExperienceSummary, src => src.ExperienceSummary)
             .Map(dest => dest.ExperienceStatistics.ExperienceMatchPercent, src => src.ExperienceMatchPercent)
             .Map(dest => dest.LanguageLevelStatistics.LanguageLevelSummary, src => src.LanguageSummary)
-            .Map(dest => dest.LanguageLevelStatistics.MatchPercent, src => src.LanguageMatchPercent);
+            .Map(dest => dest.LanguageLevelStatistics.MatchPercent, src => src.LanguageMatchPercent)
+            .Map(dest => dest.TotalStatistics.SummaryDto, src => src.Summary)
+
+            .Map(dest => dest.TotalStatistics.TotalMatchPercent, src => src.TotalMatchPercent);
+
     }
 
     public static void ResumeMappings()
