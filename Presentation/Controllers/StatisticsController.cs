@@ -26,8 +26,8 @@ public class StatisticsController(IStatisticsService statisticsService) : Contro
         return Ok(result);
     }
 
-    [HttpPost("generateOverallStatisticsBy/{vacancyId}")]
-    public async Task<IActionResult> GenerateOverallStatisticsForVacancy(int vacancyId)
+    [HttpGet("getOverallStatisticsBy/{vacancyId}")]
+    public async Task<IActionResult> GetOverallStatisticsForVacancy(int vacancyId)
     {
         var result = await statisticsService.GetAllStatisticsByVacancyIdAsync(vacancyId);
         return Ok(result);
