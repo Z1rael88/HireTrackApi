@@ -8,6 +8,6 @@ public class StatisticsRepository(IApplicationDbContext dbContext) : IStatistics
 {
     public async Task<IEnumerable<Statistics>> GetAllStatisticsByVacancyId(int vacancyId)
     {
-        return await dbContext.Statistics.Where(x => x.VacancyId == vacancyId).OrderByDescending(x=>x.TotalMatchPercent).ToListAsync();
+        return await dbContext.Statistics.Where(x => x.VacancyId == vacancyId).ToListAsync();
     }
 }

@@ -58,150 +58,189 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
 
     public async Task<IEnumerable<VacancyResume>> GetAllVacancyResumesByResumeIdAsync(int resumeId)
     {
-        return await dbContext.VacancyResumes.Where(x => x.ResumeId == resumeId).Include(x=>x.Vacancy).ToListAsync();
+        return await dbContext.VacancyResumes.Where(x => x.ResumeId == resumeId).Include(x => x.Vacancy).ToListAsync();
     }
 
     public async Task UpdateResume(Resume resume, int resumeId)
     {
-        var existing = await dbContext.Resumes
-            .Include(x=>x.Candidate)
-            .Include(r => r.LanguageLevels)
-            .Include(r => r.Educations)
-            .Include(r => r.JobExperiences)
-            .ThenInclude(j => j.Technologies)
+        var existingResume = await dbContext.Resumes
+            .Include(r => r.Candidate)
             .FirstOrDefaultAsync(r => r.Id == resumeId);
 
-        if (existing == null)
-            throw new NotFoundException("No such resume found");
+        if (existingResume == null)
+            throw new NotFoundException("Resume not found");
 
-        existing.Candidate.Email = resume.Candidate.Email;
-        existing.Candidate.Firstname = resume.Candidate.Firstname;
-        existing.Candidate.Lastname = resume.Candidate.Lastname;
-        existing.Candidate.Bio = resume.Candidate.Bio;
-        existing.Candidate.Address = resume.Candidate.Address;
-        existing.Candidate.WorkType = resume.Candidate.WorkType;
-        existing.Candidate.Age = resume.Candidate.Age;
-        existing.YearsOfExperience = resume.YearsOfExperience;
-        existing.ExpectedSalary = resume.ExpectedSalary;
-        
-        foreach (var old in existing.LanguageLevels.ToList())
-        {
-            if (!resume.LanguageLevels.Any(l => l.Id == old.Id))
-                dbContext.LanguageLevels.Remove(old);
-        }
+        UpdateResumeFields(existingResume, resume);
+        UpdateCandidate(existingResume.Candidate, resume.Candidate);
 
-        foreach (var incoming in resume.LanguageLevels)
-        {
-            var existingLevel = existing.LanguageLevels.FirstOrDefault(l => l.Id == incoming.Id);
-            if (existingLevel == null)
-            {
-                existing.LanguageLevels.Add(new LanguageLevel
-                {
-                    Level = incoming.Level,
-                    Language = incoming.Language
-                });
-            }
-            else
-            {
-                existingLevel.Level = incoming.Level;
-                existingLevel.Language = incoming.Language;
-            }
-        }
+        var existingLanguageLevels = await dbContext.LanguageLevels
+            .Where(l => l.ResumeId == resumeId)
+            .ToListAsync();
 
-        foreach (var old in existing.Educations.ToList())
-        {
-            if (!resume.Educations.Any(e => e.Id == old.Id))
-                dbContext.Educations.Remove(old);
-        }
+        var existingEducations = await dbContext.Educations
+            .Where(e => e.ResumeId == resumeId)
+            .ToListAsync();
 
-        foreach (var incoming in resume.Educations)
-        {
-            var existingEdu = existing.Educations.FirstOrDefault(e => e.Id == incoming.Id);
-            if (existingEdu == null)
-            {
-                existing.Educations.Add(new Education
-                {
-                    Title = incoming.Title,
-                    Degree = incoming.Degree,
-                    Description = incoming.Description,
-                    StartDate = incoming.StartDate,
-                    EndDate = incoming.EndDate,
-                    EducationType = incoming.EducationType
-                });
-            }
-            else
-            {
-                existingEdu.Title = incoming.Title;
-                existingEdu.Degree = incoming.Degree;
-                existingEdu.Description = incoming.Description;
-                existingEdu.StartDate = incoming.StartDate;
-                existingEdu.EndDate = incoming.EndDate;
-                existingEdu.EducationType = incoming.EducationType;
-            }
-        }
+        var existingJobExperiences = await dbContext.JobExperiences
+            .Where(j => j.ResumeId == resumeId)
+            .ToListAsync();
 
-        foreach (var old in existing.JobExperiences.ToList())
-        {
-            if (!resume.JobExperiences.Any(j => j.Id == old.Id))
-                dbContext.JobExperiences.Remove(old);
-        }
+        /*var existingTechnologies = await dbContext.Technologies
+            .Where(t => existingJobExperiences.Select(j => j.Id).Contains(t.JobExperienceId))
+            .ToListAsync();*/
 
-        foreach (var incoming in resume.JobExperiences)
-        {
-            var existingJob = existing.JobExperiences.FirstOrDefault(j => j.Id == incoming.Id);
-            if (existingJob == null)
-            {
-                var newJob = new JobExperience
-                {
-                    NameOfCompany = incoming.NameOfCompany,
-                    StartDate = incoming.StartDate,
-                    EndDate = incoming.EndDate,
-                    Description = incoming.Description,
-                    Technologies = incoming.Technologies
-                        .Select(t => new Technology
-                        {
-                            TechnologyType = t.TechnologyType,
-                            TechnologyTypeId = t.TechnologyTypeId,
-                            YearsOfExperience = t.YearsOfExperience
-                        }).ToList()
-                };
-                existing.JobExperiences.Add(newJob);
-            }
-            else
-            {
-                existingJob.NameOfCompany = incoming.NameOfCompany;
-                existingJob.StartDate = incoming.StartDate;
-                existingJob.EndDate = incoming.EndDate;
-                existingJob.Description = incoming.Description;
-
-                foreach (var oldTech in existingJob.Technologies.ToList())
-                {
-                    if (!incoming.Technologies.Any(t => t.Id == oldTech.Id))
-                        dbContext.Technologies.Remove(oldTech);
-                }
-
-                foreach (var tech in incoming.Technologies)
-                {
-                    var existingTech = existingJob.Technologies.FirstOrDefault(t => t.Id == tech.Id);
-                    if (existingTech == null)
-                    {
-                        existingJob.Technologies.Add(new Technology
-                        {
-                            TechnologyType = tech.TechnologyType,
-                            TechnologyTypeId = tech.TechnologyTypeId,
-                            YearsOfExperience = tech.YearsOfExperience
-                        });
-                    }
-                    else
-                    {
-                        existingTech.TechnologyType = tech.TechnologyType;
-                        existingTech.TechnologyTypeId = tech.TechnologyTypeId;
-                        existingTech.YearsOfExperience = tech.YearsOfExperience;
-                    }
-                }
-            }
-        }
+        UpdateLanguageLevels(existingLanguageLevels, resume.LanguageLevels.ToList(), resumeId);
+        UpdateEducations(existingEducations, resume.Educations.ToList(), resumeId);
+        await UpdateJobExperiencesAsync(existingJobExperiences, resume.JobExperiences.ToList());
 
         await dbContext.SaveChangesAsync();
+    }
+
+
+    private void UpdateResumeFields(Resume existing, Resume incoming)
+    {
+        existing.YearsOfExperience = incoming.YearsOfExperience;
+        existing.ExpectedSalary = incoming.ExpectedSalary;
+    }
+
+    private void UpdateCandidate(Candidate existing, Candidate incoming)
+    {
+        existing.Firstname = incoming.Firstname;
+        existing.Lastname = incoming.Lastname;
+        existing.Email = incoming.Email;
+        existing.Bio = incoming.Bio;
+        existing.Address = incoming.Address;
+        existing.WorkType = incoming.WorkType;
+        existing.Age = incoming.Age;
+    }
+
+    private void UpdateLanguageLevels(List<LanguageLevel> existing, List<LanguageLevel> incoming, int resumeId)
+    {
+        var toUpdate = existing.Where(e => incoming.Any(i => i.Id == e.Id)).ToList();
+        foreach (var existingItem in toUpdate)
+        {
+            var incomingItem = incoming.First(i => i.Id == existingItem.Id);
+            existingItem.Language = incomingItem.Language;
+            existingItem.Level = incomingItem.Level;
+        }
+
+        dbContext.LanguageLevels.UpdateRange(toUpdate);
+
+        var toAdd = incoming.Where(i => i.Id == 0)
+            .Select(i => new LanguageLevel
+            {
+                ResumeId = resumeId,
+                Language = i.Language,
+                Level = i.Level
+            })
+            .ToList();
+        dbContext.LanguageLevels.AddRange(toAdd);
+
+        var toRemove = existing.Where(e => incoming.All(i => i.Id != e.Id)).ToList();
+        dbContext.LanguageLevels.RemoveRange(toRemove);
+    }
+
+    private void UpdateEducations(List<Education> existing, List<Education> incoming, int resumeId)
+    {
+        var toUpdate = existing.Where(e => incoming.Any(i => i.Id == e.Id)).ToList();
+        foreach (var existingItem in toUpdate)
+        {
+            var incomingItem = incoming.First(i => i.Id == existingItem.Id);
+            existingItem.Title = incomingItem.Title;
+            existingItem.Degree = incomingItem.Degree;
+            existingItem.Description = incomingItem.Description;
+            existingItem.StartDate = incomingItem.StartDate;
+            existingItem.EndDate = incomingItem.EndDate;
+            existingItem.EducationType = incomingItem.EducationType;
+        }
+
+        dbContext.Educations.UpdateRange(toUpdate);
+
+        var toAdd = incoming.Where(i => i.Id == 0)
+            .Select(i => new Education
+            {
+                ResumeId = resumeId,
+                Title = i.Title,
+                Degree = i.Degree,
+                Description = i.Description,
+                StartDate = i.StartDate,
+                EndDate = i.EndDate,
+                EducationType = i.EducationType
+            })
+            .ToList();
+        dbContext.Educations.AddRange(toAdd);
+
+        var toRemove = existing.Where(e => incoming.All(i => i.Id != e.Id)).ToList();
+        dbContext.Educations.RemoveRange(toRemove);
+    }
+
+    private async Task UpdateJobExperiencesAsync(List<JobExperience> existing, List<JobExperience> incoming)
+    {
+        var toUpdate = existing.Where(e => incoming.Any(i => i.Id == e.Id)).ToList();
+        foreach (var existingItem in toUpdate)
+        {
+            var incomingItem = incoming.First(i => i.Id == existingItem.Id);
+            existingItem.NameOfCompany = incomingItem.NameOfCompany;
+            existingItem.StartDate = incomingItem.StartDate;
+            existingItem.EndDate = incomingItem.EndDate;
+            existingItem.Description = incomingItem.Description;
+
+            await UpdateTechnologiesAsync(existingItem, incomingItem.Technologies.ToList());
+        }
+
+        dbContext.JobExperiences.UpdateRange(toUpdate);
+
+        var toAdd = incoming.Where(i => i.Id == 0)
+            .Select(i => new JobExperience
+            {
+                ResumeId = i.ResumeId,
+                NameOfCompany = i.NameOfCompany,
+                StartDate = i.StartDate,
+                EndDate = i.EndDate,
+                Description = i.Description,
+                Technologies = i.Technologies.Select(t => new Technology
+                {
+                    TechnologyType = t.TechnologyType,
+                    TechnologyTypeId = t.TechnologyTypeId,
+                    YearsOfExperience = t.YearsOfExperience
+                }).ToList()
+            })
+            .ToList();
+        dbContext.JobExperiences.AddRange(toAdd);
+
+        var toRemove = existing.Where(e => incoming.All(i => i.Id != e.Id)).ToList();
+        dbContext.JobExperiences.RemoveRange(toRemove);
+    }
+
+    private async Task UpdateTechnologiesAsync(JobExperience existingJob, List<Technology> incomingTechnologies)
+    {
+        var existingTechnologies = await dbContext.Technologies
+            .Where(t => t.JobExperienceId == existingJob.Id)
+            .ToListAsync();
+
+        var toUpdate = existingTechnologies.Where(e => incomingTechnologies.Any(i => i.Id == e.Id)).ToList();
+        foreach (var existingItem in toUpdate)
+        {
+            var incomingItem = incomingTechnologies.First(i => i.Id == existingItem.Id);
+            existingItem.TechnologyType = incomingItem.TechnologyType;
+            existingItem.TechnologyTypeId = incomingItem.TechnologyTypeId;
+            existingItem.YearsOfExperience = incomingItem.YearsOfExperience;
+        }
+
+        dbContext.Technologies.UpdateRange(toUpdate);
+
+        var toAdd = incomingTechnologies.Where(i => i.Id == 0)
+            .Select(i => new Technology
+            {
+                JobExperienceId = existingJob.Id,
+                TechnologyType = i.TechnologyType,
+                TechnologyTypeId = i.TechnologyTypeId,
+                YearsOfExperience = i.YearsOfExperience
+            })
+            .ToList();
+        dbContext.Technologies.AddRange(toAdd);
+
+        var toRemove = existingTechnologies.Where(e => incomingTechnologies.All(i => i.Id != e.Id)).ToList();
+        dbContext.Technologies.RemoveRange(toRemove);
     }
 }

@@ -9,6 +9,8 @@ public class StatisticsConfiguration : BaseEntityConfiguration<Statistics>
     public override void Configure(EntityTypeBuilder<Statistics> builder)
     {
         base.Configure(builder);
+        builder.HasIndex(x => new { x.ResumeId, x.VacancyId })
+            .IsUnique();
         builder.Property(x => x.ResumeId).IsRequired();
         builder.Property(x => x.VacancyId).IsRequired();
         builder.Property(x => x.TotalMatchPercent).IsRequired();

@@ -7,4 +7,6 @@ public class JobExperience : BaseEntity
     public DateOnly? EndDate { get; set; }
     public ICollection<Technology> Technologies { get; set; }
     public string Description { get; set; } = string.Empty;
+    
+    public int ResumeId { get; set; }
 }
