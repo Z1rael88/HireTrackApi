@@ -46,18 +46,19 @@ public class ResumeService(IUnitOfWork unitOfWork,
         }
 
         var createdResume = await _repository.CreateAsync(resume);
-        if (dto.VacancyId is not 0)
+
+        if (dto.VacancyId != 0)
         {
-            createdResume.VacancyResumes = new List<VacancyResume>
+            var vacancyResume = new VacancyResume
             {
-                new()
-                {
-                    VacancyId = (int)dto.VacancyId!,
-                    ResumeId = createdResume.Id,
-                    Status = ResumeStatus.Sent
-                }
+                VacancyId = dto.VacancyId.Value,
+                ResumeId = createdResume.Id,
+                Status = ResumeStatus.Sent
             };
+
+            await _vacancyResumeRepository.CreateAsync(vacancyResume);
         }
+
 
         var user = await userManager.FindByEmailAsync(resume.Candidate.Email);
         var candidate = await _candidateCommonRepository.GetCandidateByEmailAsync(resume.Candidate.Email);
