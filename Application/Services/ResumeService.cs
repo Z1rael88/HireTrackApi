@@ -84,14 +84,12 @@ public class ResumeService(IUnitOfWork unitOfWork,
     {
         var resumes = await _resumeRepository.GetAllResumesByVacancyId(vacancyId);
 
-        var statusTasks = resumes.Select(r => _vacancyRepository.GetResumeStatusByResumeIdAsync(r.Id));
-        var statuses = await Task.WhenAll(statusTasks);
-
         var result = resumes.Adapt<List<ResumeResponseDto>>();
 
-        for (var i = 0; i < result.Count; i++)
+        foreach (var dto in result)
         {
-            result[i].Status = statuses[i];
+            dto.Status =
+                await _vacancyRepository.GetResumeStatusByResumeIdAsync(dto.Id);
         }
 
         return result;
