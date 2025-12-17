@@ -91,7 +91,7 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
 
         UpdateLanguageLevels(existingLanguageLevels, resume.LanguageLevels.ToList(), resumeId);
         UpdateEducations(existingEducations, resume.Educations.ToList(), resumeId);
-        await UpdateJobExperiencesAsync(existingJobExperiences, resume.JobExperiences.ToList());
+        await UpdateJobExperiencesAsync(existingJobExperiences, resume.JobExperiences.ToList(),resumeId);
 
         await dbContext.SaveChangesAsync();
     }
@@ -174,7 +174,7 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
         dbContext.Educations.RemoveRange(toRemove);
     }
 
-    private async Task UpdateJobExperiencesAsync(List<JobExperience> existing, List<JobExperience> incoming)
+    private async Task UpdateJobExperiencesAsync(List<JobExperience> existing, List<JobExperience> incoming,int resumeId)
     {
         var toUpdate = existing.Where(e => incoming.Any(i => i.Id == e.Id)).ToList();
         foreach (var existingItem in toUpdate)
@@ -193,7 +193,7 @@ public class ResumeRepository(IApplicationDbContext dbContext) : IResumeReposito
         var toAdd = incoming.Where(i => i.Id == 0)
             .Select(i => new JobExperience
             {
-                ResumeId = i.ResumeId,
+                ResumeId = resumeId,
                 NameOfCompany = i.NameOfCompany,
                 StartDate = i.StartDate,
                 EndDate = i.EndDate,
