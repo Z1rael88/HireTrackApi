@@ -32,14 +32,14 @@ public static class MapsterConfig
         TypeAdapterConfig<JobExperienceRequirement, JobExperienceRequirementDto>
             .NewConfig()
             .Map(dest => dest.TechnologyRequirements, src => src.TechnologyRequirements);
-        
+
         TypeAdapterConfig<EducationRequirement, EducationRequirementDto>
             .NewConfig()
             .Map(dest => dest.Degree, src => src.Degree)
             .Map(dest => dest.EducationType, src => src.EducationType);
 
         TypeAdapterConfig<TechnologyRequirement, TechnologyRequirementDto>
-            .NewConfig() 
+            .NewConfig()
             .Map(dest => dest.TechnologyTypeId, src => src.TechnologyTypeId)
             .Map(dest => dest.YearsOfExperience, src => src.YearsOfExperience);
         TypeAdapterConfig<Vacancy, VacancyResponseDto>
@@ -51,13 +51,12 @@ public static class MapsterConfig
                 JobExperience = src.JobExperienceRequirement.Adapt<JobExperienceRequirementResponseDto>(),
                 YearsOfExperience = src.YearsOfExperience,
             });
-           
+
         TypeAdapterConfig<TechnologyType, TechnologyTypeDto>
             .NewConfig();
         TypeAdapterConfig<TechnologyRequirement, TechnologyRequirementResponseDto>
             .NewConfig()
-            .Map(dest => dest.TechnologyTypeDto, src =>src.TechnologyType);
-
+            .Map(dest => dest.TechnologyTypeDto, src => src.TechnologyType);
     }
 
     public static void UserMappings()
@@ -90,9 +89,9 @@ public static class MapsterConfig
             .Map(dest => dest.LanguageLevelStatistics.LanguageLevelSummary, src => src.LanguageSummary)
             .Map(dest => dest.LanguageLevelStatistics.MatchPercent, src => src.LanguageMatchPercent)
             .Map(dest => dest.TotalStatistics.SummaryDto, src => src.Summary)
-
-            .Map(dest => dest.TotalStatistics.TotalMatchPercent, src => src.TotalMatchPercent);
-
+            .Map(dest => dest.TotalStatistics.TotalMatchPercent, src => src.TotalMatchPercent)
+            .Map(dest => dest.ResumeId, src => src.ResumeId)
+            .Map(dest => dest.VacancyId, src => src.VacancyId);
     }
 
     public static void ResumeMappings()
