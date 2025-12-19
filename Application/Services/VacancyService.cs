@@ -61,13 +61,17 @@ public class VacancyService(
         await _repository.DeleteAsync(vacancyId);
     }
 
-    public async Task<IEnumerable<VacancyWithStatusDto>> GetVacanciesByUserIdAsync(int userId)
+    public async Task<IEnumerable<VacancyWithStatusDto>?> GetVacanciesByUserIdAsync(int userId)
     {
         var user = await userManager.FindByIdAsync(userId.ToString())
                    ?? throw new NotFoundException("User with such id not found");
 
         var resume = await _resumeRepository.GetResumeByCandidateEmail(user.Email!);
         var vacancyResumes = await _resumeRepository.GetAllVacancyResumesByResumeIdAsync(resume.Id);
+        if (vacancyResumes is null)
+        {
+            return null;
+        }
         var vacancies = vacancyResumes.Select(x => x.Vacancy);
         var statusByVacancyId = vacancyResumes
             .ToDictionary(x => x.VacancyId, x => x.Status);
