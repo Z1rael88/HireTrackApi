@@ -67,6 +67,10 @@ public class VacancyService(
                    ?? throw new NotFoundException("User with such id not found");
 
         var resume = await _resumeRepository.GetResumeByCandidateEmail(user.Email!);
+        if (resume is null)
+        {
+            throw new NotFoundException("Resume for user with that email is not found");
+        }
         var vacancyResumes = await _resumeRepository.GetAllVacancyResumesByResumeIdAsync(resume.Id);
         if (vacancyResumes is null)
         {
