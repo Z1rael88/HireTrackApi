@@ -1,4 +1,5 @@
 using Application.Dtos.Vacancy;
+using Domain.Models;
 
 namespace Application.Interfaces;
 
@@ -12,4 +13,5 @@ public interface IVacancyService
     Task DeleteVacancyAsync(int vacancyId);
     Task<IEnumerable<VacancyWithStatusDto>?> GetVacanciesByUserIdAsync(int userId);
     Task<IEnumerable<VacancyResponseDto>>  GetByHrIdAsync(int hrId);
+    Task UpdateVacancyAsync(Vacancy vacancy, int vacancyId);
 }

@@ -1,5 +1,4 @@
 using Domain.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Interfaces;
@@ -16,6 +15,11 @@ public interface IApplicationDbContext
     DbSet<LanguageLevel> LanguageLevels { get; }
     DbSet<Candidate> Candidates { get; }
     DbSet<Statistics> Statistics { get; }
+    DbSet<LanguageLevelRequirement> LanguageLevelRequirements { get; }
+
+    DbSet<EducationRequirement> EducationRequirements { get; }
+    DbSet<JobExperienceRequirement> JobExperienceRequirements { get; }
+
     DbSet<VacancyResume> VacancyResumes { get; }
     Task<int> SaveChangesAsync();
 }

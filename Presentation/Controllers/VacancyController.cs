@@ -1,6 +1,7 @@
 using Application.Dtos.Vacancy;
 using Application.Interfaces;
 using Domain.Enums;
+using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -66,6 +67,13 @@ namespace Presentation.Controllers
         {
             var result = await vacancyService.GetByHrIdAsync(hrId);
             return Ok(result);
+        }
+
+        [HttpPut("{vacancyId}")]
+        public async Task<IActionResult> UpdateVacancyAsync(Vacancy vacancy, int vacancyId)
+        {
+            await vacancyService.UpdateVacancyAsync(vacancy, vacancyId);
+            return Ok();
         }
     }
 }

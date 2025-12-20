@@ -21,6 +21,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<LanguageLevel> LanguageLevels { get; set; }
     public DbSet<Candidate> Candidates{ get; set; }
     public DbSet<Statistics> Statistics { get; set; }
+    public DbSet<LanguageLevelRequirement> LanguageLevelRequirements { get; set; }
+    public DbSet<EducationRequirement> EducationRequirements { get; set; }
+    public DbSet<JobExperienceRequirement> JobExperienceRequirements { get; set; }
     public DbSet<VacancyResume> VacancyResumes { get; set; }
     public async Task<int> SaveChangesAsync()
     {
