@@ -1,6 +1,6 @@
 namespace Domain.Enums;
 
-public enum LanguageLevel
+public enum Level
 {
     Beginner = 1,
     Intermediate = 2,

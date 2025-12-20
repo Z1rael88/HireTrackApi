@@ -2,7 +2,6 @@ using Domain.Enums;
 using Domain.Models;
 using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using LanguageLevel = Domain.Enums.LanguageLevel;
 
 namespace Infrastructure.Data.Seeders;
 
@@ -37,8 +36,8 @@ public class ResumeSeeder(IApplicationDbContext db)
             ExpectedSalary = 24000,
             LanguageLevels = new List<Domain.Models.LanguageLevel>
             {
-                new() { Language = Language.Polish, Level = LanguageLevel.Native },
-                new() { Language = Language.English, Level = LanguageLevel.Advanced }
+                new() { Language = Language.Polish, Level = Level.Native },
+                new() { Language = Language.English, Level = Level.Advanced }
             },
             JobExperiences = new List<JobExperience>
             {

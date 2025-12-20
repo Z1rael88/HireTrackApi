@@ -3,7 +3,6 @@ using Domain.Models;
 using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using LanguageLevel = Domain.Enums.LanguageLevel;
 
 namespace Infrastructure.Data.Seeders;
 
@@ -56,8 +55,8 @@ public class VacancySeeder(IApplicationDbContext db, UserManager<User> userManag
             Responsibilities = "Projektowanie i rozwój usług backendowych w oparciu o .NET 6/7/8; ...",
             LanguageLevelRequirements = new List<LanguageLevelRequirement>
             {
-                new() { Language = Language.English, Level = LanguageLevel.UpperIntermediate },
-                new() { Language = Language.Polish, Level = LanguageLevel.Native }
+                new() { Language = Language.English, Level = Level.UpperIntermediate },
+                new() { Language = Language.Polish, Level = Level.Native }
             },
             JobExperienceRequirement = new JobExperienceRequirement
             {
@@ -90,8 +89,8 @@ public class VacancySeeder(IApplicationDbContext db, UserManager<User> userManag
                 "Projektowanie i rozwój zaawansowanych aplikacji frontendowych w oparciu o React i TypeScript; ...",
             LanguageLevelRequirements = new List<LanguageLevelRequirement>
             {
-                new() { Language = Language.English, Level = LanguageLevel.UpperIntermediate },
-                new() { Language = Language.Polish, Level = LanguageLevel.UpperIntermediate }
+                new() { Language = Language.English, Level = Level.UpperIntermediate },
+                new() { Language = Language.Polish, Level = Level.UpperIntermediate }
             },
             JobExperienceRequirement = new JobExperienceRequirement
             {

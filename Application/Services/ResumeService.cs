@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Syncfusion.Pdf;
 using Syncfusion.Pdf.Parsing;
-using LanguageLevel = Domain.Enums.LanguageLevel;
 
 namespace Application.Services;
 
@@ -227,17 +226,17 @@ public class ResumeService(IUnitOfWork unitOfWork,
                     continue;
 
                 var levelText = parts[1].Trim();
-                if (!Enum.TryParse<LanguageLevel>(levelText, true, out var level))
+                if (!Enum.TryParse<Level>(levelText, true, out var level))
                 {
                     level = levelText switch
                     {
-                        "A1" => LanguageLevel.Beginner,
-                        "A2" => LanguageLevel.Beginner,
-                        "B1" => LanguageLevel.Intermediate,
-                        "B2" => LanguageLevel.Intermediate,
-                        "C1" => LanguageLevel.Advanced,
-                        "C2" => LanguageLevel.Native,
-                        _ => LanguageLevel.Beginner
+                        "A1" => Level.Beginner,
+                        "A2" => Level.Beginner,
+                        "B1" => Level.Intermediate,
+                        "B2" => Level.Intermediate,
+                        "C1" => Level.Advanced,
+                        "C2" => Level.Native,
+                        _ => Level.Beginner
                     };
                 }
 

@@ -18,7 +18,7 @@ public class CrmController(ICrmService crmService) : ControllerBase
     [HttpGet("languageLevels")]
     public IActionResult GetAllLanguageLevels()
     {
-        var languageLevels = Enum.GetNames(typeof(LanguageLevel));
+        var languageLevels = Enum.GetNames(typeof(Level));
         return Ok(languageLevels);
     }
     [HttpGet("degrees")]

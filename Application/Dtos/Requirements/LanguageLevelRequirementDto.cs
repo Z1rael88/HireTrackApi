@@ -5,5 +5,5 @@ namespace Application.Dtos.Requirements;
 public class LanguageLevelRequirementDto
 {
     public required Language Language { get; set; }
-    public required LanguageLevel Level { get; set; }
+    public required Level Level { get; set; }
 }
