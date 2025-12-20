@@ -1,4 +1,6 @@
 using Application.Interfaces;
+using Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;
@@ -7,6 +9,7 @@ namespace Presentation.Controllers;
 [Route("users/")]
 public class UserController(IUserService userService) : ControllerBase
 {
+    [Authorize(Roles = $"{nameof(Role.HrManager)},{nameof(Role.Candidate)}")]
     [HttpGet("byUserId/{userId}")]
     public async Task<IActionResult> GetUserProfile(int userId)
     {

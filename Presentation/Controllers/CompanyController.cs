@@ -1,5 +1,7 @@
 using Application.Dtos.Company;
 using Application.Interfaces;
+using Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;
@@ -8,6 +10,7 @@ namespace Presentation.Controllers;
 [Route("companies/")]
 public class CompanyController(ICompanyService companyService) : ControllerBase
 {
+    [Authorize(Roles = nameof(Role.SystemAdministrator))]
     [HttpPost]
     public async Task<IActionResult> CreateCompany(CompanyRequestDto dto)
     {
@@ -26,6 +29,7 @@ public class CompanyController(ICompanyService companyService) : ControllerBase
         var company = await companyService.GetCompanyByIdAsync(companyId);
         return Ok(company);
     }
+    [Authorize(Roles = nameof(Role.SystemAdministrator))]
     [HttpDelete]
     public async Task<IActionResult> DeleteCompany(int companyId)
     {

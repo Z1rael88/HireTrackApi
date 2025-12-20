@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers
 {
-   // [Authorize(Roles = $"{nameof(Role.HrManager)},{nameof(Role.CompanyAdministrator)}")]
     [Route("vacancies")]
     [ApiController]
     public class VacancyController(IVacancyService vacancyService) : ControllerBase
@@ -19,56 +18,49 @@ namespace Presentation.Controllers
             var vacancy = await vacancyService.CreateVacancyAsync(vacancyRequestDto);
             return Ok(vacancy);
         }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateVacancy([FromBody] VacancyRequestDto updateVacancyRequestDto)
-        {
-            var vacancy = await vacancyService.UpdateVacancyAsync(updateVacancyRequestDto);
-            return Ok(vacancy);
-        }
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetVacancyById(int id)
         {
             var vacancy = await vacancyService.GetVacancyByIdAsync(id);
             return Ok(vacancy);
         }
-
+        [Authorize(Roles = $"{nameof(Role.HrManager)},{nameof(Role.Candidate)}")]
         [HttpGet]
         public async Task<IActionResult> GetVacancies()
         {
             var vacancies = await vacancyService.GetVacanciesAsync();
             return Ok(vacancies);
         }
-
+        [Authorize(Roles = $"{nameof(Role.HrManager)},{nameof(Role.Candidate)}")]
         [HttpGet("byCompanyId/{companyId}")]
         public async Task<IActionResult> GetAllVacanciesByCompanyId(int companyId)
         {
             var vacancies = await vacancyService.GetAllVacanciesByCompanyIdAsync(companyId);
             return Ok(vacancies);
         }
-
+        [Authorize(Roles = nameof(Role.HrManager))]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVacancy(int id)
         {
             await vacancyService.DeleteVacancyAsync(id);
             return NoContent();
         }
-
+        [Authorize(Roles = nameof(Role.Candidate))]
         [HttpGet("byUserId")]
         public async Task<IActionResult> GetVacanciesByUserId(int userId)
         {
             var result = await vacancyService.GetVacanciesByUserIdAsync(userId);
             return Ok(result);
         }
-        
+        [Authorize(Roles = nameof(Role.HrManager))]
         [HttpGet("byHrId")]
         public async Task<IActionResult> GetVacanciesByHrId(int hrId)
         {
             var result = await vacancyService.GetByHrIdAsync(hrId);
             return Ok(result);
         }
-
+        
+        [Authorize(Roles = nameof(Role.HrManager))]
         [HttpPut("{vacancyId}")]
         public async Task<IActionResult> UpdateVacancyAsync(Vacancy vacancy, int vacancyId)
         {

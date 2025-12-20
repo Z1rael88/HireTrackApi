@@ -1,4 +1,6 @@
 using Application.Interfaces;
+using Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;
@@ -7,25 +9,14 @@ namespace Presentation.Controllers;
 [Route("statistics/")]
 public class StatisticsController(IStatisticsService statisticsService) : ControllerBase
 {
-    [HttpGet("{vacancyId}")]
-    public async Task<IActionResult> GetOverallStatisticsByVacancyId(int vacancyId)
-    {
-        return Ok();
-    }
-
-    [HttpGet("{vacancyId}/{resumeId}")]
-    public async Task<IActionResult> GetStatisticsByVacancyIdAndResumeId(int vacancyId, int resumeId)
-    {
-        return Ok();
-    }
-
+    [Authorize(Roles = nameof(Role.HrManager))]
     [HttpPost("generateStatisticsBy/{resumeId}")]
     public async Task<IActionResult> GenerateStatisticsForResume(int vacancyId, int resumeId)
     {
         var result = await statisticsService.GenerateStatisticsForResumeAsync(vacancyId, resumeId);
         return Ok(result);
     }
-
+    [Authorize(Roles = nameof(Role.HrManager))]
     [HttpGet("getOverallStatisticsBy/{vacancyId}")]
     public async Task<IActionResult> GetOverallStatisticsForVacancy(int vacancyId)
     {
