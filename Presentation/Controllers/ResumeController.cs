@@ -44,7 +44,7 @@ public class ResumeController(IResumeService resumeService) : ControllerBase
         await resumeService.UpdateResumeAsync(resume, resumeId);
         return Ok();
     }
-    [Authorize(Roles = nameof(Role.HrManager))]
+    [Authorize(Roles = $"{nameof(Role.HrManager)},{nameof(Role.Candidate)}")]
     [HttpGet("byUserId/{userId}")]
     public async Task<IActionResult> GetResumeByUserId(int userId)
     {
