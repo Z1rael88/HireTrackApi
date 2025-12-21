@@ -62,7 +62,7 @@ namespace Presentation.Controllers
         
         [Authorize(Roles = nameof(Role.HrManager))]
         [HttpPut("{vacancyId}")]
-        public async Task<IActionResult> UpdateVacancyAsync(Vacancy vacancy, int vacancyId)
+        public async Task<IActionResult> UpdateVacancyAsync(VacancyRequestDto vacancy, int vacancyId)
         {
             await vacancyService.UpdateVacancyAsync(vacancy, vacancyId);
             return Ok();
