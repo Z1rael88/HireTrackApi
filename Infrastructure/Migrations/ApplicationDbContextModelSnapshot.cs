@@ -64,7 +64,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Candidates");
+                    b.ToTable("Candidates", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.Company", b =>
@@ -88,7 +88,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Companies");
+                    b.ToTable("Companies", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.Education", b =>
@@ -127,7 +127,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResumeId");
 
-                    b.ToTable("Educations");
+                    b.ToTable("Educations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.EducationRequirement", b =>
@@ -152,7 +152,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("VacancyId")
                         .IsUnique();
 
-                    b.ToTable("EducationRequirements");
+                    b.ToTable("EducationRequirements", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.JobExperience", b =>
@@ -185,7 +185,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResumeId");
 
-                    b.ToTable("JobExperiences");
+                    b.ToTable("JobExperiences", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.JobExperienceRequirement", b =>
@@ -204,7 +204,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("VacancyId")
                         .IsUnique();
 
-                    b.ToTable("JobExperienceRequirements");
+                    b.ToTable("JobExperienceRequirements", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.LanguageLevel", b =>
@@ -228,7 +228,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResumeId");
 
-                    b.ToTable("LanguageLevels");
+                    b.ToTable("LanguageLevels", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.LanguageLevelRequirement", b =>
@@ -252,7 +252,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("VacancyId");
 
-                    b.ToTable("LanguageLevelRequirements");
+                    b.ToTable("LanguageLevelRequirements", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.Resume", b =>
@@ -276,7 +276,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CandidateId");
 
-                    b.ToTable("Resumes");
+                    b.ToTable("Resumes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.Statistics", b =>
@@ -324,7 +324,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ResumeId", "VacancyId")
                         .IsUnique();
 
-                    b.ToTable("Statistics", t =>
+                    b.ToTable("Statistics", null, t =>
                         {
                             t.Property("EducationSummary")
                                 .HasColumnName("Statistics_EducationSummary");
@@ -345,9 +345,6 @@ namespace Infrastructure.Migrations
                     b.Property<int>("JobExperienceId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("JobExperienceRequirementId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("TechnologyTypeId")
                         .HasColumnType("integer");
 
@@ -356,11 +353,11 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("JobExperienceRequirementId");
+                    b.HasIndex("JobExperienceId");
 
                     b.HasIndex("TechnologyTypeId");
 
-                    b.ToTable("Technologies");
+                    b.ToTable("Technologies", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.TechnologyRequirement", b =>
@@ -386,7 +383,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TechnologyTypeId");
 
-                    b.ToTable("TechnologyRequirement");
+                    b.ToTable("TechnologyRequirement", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.TechnologyType", b =>
@@ -413,7 +410,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("TechnologyTypes");
+                    b.ToTable("TechnologyTypes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.User", b =>
@@ -557,7 +554,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("HrId");
 
-                    b.ToTable("Vacancies");
+                    b.ToTable("Vacancies", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Models.VacancyResume", b =>
@@ -584,7 +581,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ResumeId", "VacancyId")
                         .IsUnique();
 
-                    b.ToTable("VacancyResumes");
+                    b.ToTable("VacancyResumes", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
@@ -725,7 +722,7 @@ namespace Infrastructure.Migrations
                         .WithOne()
                         .HasForeignKey("Domain.Models.Candidate", "UserId");
 
-                    b.OwnsOne("Domain.Models.Address", "Address", b1 =>
+                    b.OwnsOne("Domain.Models.Candidate.Address#Domain.Models.Address", "Address", b1 =>
                         {
                             b1.Property<int>("CandidateId")
                                 .HasColumnType("integer");
@@ -742,7 +739,7 @@ namespace Infrastructure.Migrations
 
                             b1.HasKey("CandidateId");
 
-                            b1.ToTable("Candidates");
+                            b1.ToTable("Candidates", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("CandidateId");
@@ -831,7 +828,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("Domain.Models.StatisticsSummary", "Summary", b1 =>
+                    b.OwnsOne("Domain.Models.Statistics.Summary#Domain.Models.StatisticsSummary", "Summary", b1 =>
                         {
                             b1.Property<int>("StatisticsId")
                                 .HasColumnType("integer");
@@ -858,7 +855,7 @@ namespace Infrastructure.Migrations
 
                             b1.HasKey("StatisticsId");
 
-                            b1.ToTable("Statistics");
+                            b1.ToTable("Statistics", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("StatisticsId");
@@ -876,7 +873,7 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Models.JobExperience", null)
                         .WithMany("Technologies")
-                        .HasForeignKey("JobExperienceRequirementId")
+                        .HasForeignKey("JobExperienceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -922,7 +919,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("Domain.Models.Address", "Address", b1 =>
+                    b.OwnsOne("Domain.Models.Vacancy.Address#Domain.Models.Address", "Address", b1 =>
                         {
                             b1.Property<int>("VacancyId")
                                 .HasColumnType("integer");
@@ -939,7 +936,7 @@ namespace Infrastructure.Migrations
 
                             b1.HasKey("VacancyId");
 
-                            b1.ToTable("Vacancies");
+                            b1.ToTable("Vacancies", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("VacancyId");

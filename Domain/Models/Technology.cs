@@ -6,5 +6,4 @@ public class Technology : BaseEntity
     public TechnologyType TechnologyType { get; set; }
     public int TechnologyTypeId { get; set; }
     public int JobExperienceId { get; set; }
-    public int JobExperienceRequirementId { get; set; }
 }

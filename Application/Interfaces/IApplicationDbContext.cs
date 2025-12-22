@@ -15,7 +15,7 @@ public interface IApplicationDbContext
     IQueryable<Candidate> Candidates { get; }
     IQueryable<Statistics> Statistics { get; }
     IQueryable<LanguageLevelRequirement> LanguageLevelRequirements { get; }
-
+    IQueryable<TechnologyRequirement> TechnologyRequirements { get; }
     IQueryable<EducationRequirement> EducationRequirements { get; }
     IQueryable<JobExperienceRequirement> JobExperienceRequirements { get; }
 

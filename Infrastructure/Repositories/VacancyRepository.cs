@@ -191,7 +191,7 @@ public class VacancyRepository(ApplicationDbContext dbContext) : IVacancyReposit
         JobExperienceRequirement existingJob,
         List<TechnologyRequirement> incomingTechnologies)
     {
-        var existingTechnologies = await dbContext.Technologies
+        var existingTechnologies = await dbContext.TechnologyRequirements
             .Where(t => t.JobExperienceRequirementId == existingJob.Id)
             .ToListAsync();
 
@@ -207,7 +207,7 @@ public class VacancyRepository(ApplicationDbContext dbContext) : IVacancyReposit
 
         var toAdd = incomingTechnologies
             .Where(i => i.Id == 0)
-            .Select(i => new Technology
+            .Select(i => new TechnologyRequirement
             {
                 JobExperienceRequirementId = existingJob.Id,
                 TechnologyType = i.TechnologyType,
@@ -215,13 +215,13 @@ public class VacancyRepository(ApplicationDbContext dbContext) : IVacancyReposit
                 YearsOfExperience = i.YearsOfExperience
             });
 
-        dbContext.Technologies.AddRange(toAdd);
+        dbContext.TechnologyRequirements.AddRange(toAdd);
 
         var toRemove = existingTechnologies
             .Where(e => incomingTechnologies.All(i => i.Id != e.Id))
             .ToList();
 
-        dbContext.Technologies.RemoveRange(toRemove);
+        dbContext.TechnologyRequirements.RemoveRange(toRemove);
     }
 
 }

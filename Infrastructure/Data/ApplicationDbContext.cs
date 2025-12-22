@@ -15,6 +15,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Resume> Resumes { get; set; }
     public DbSet<Education> Educations { get; set; }
     public DbSet<Technology> Technologies { get; set; }
+    public DbSet<TechnologyRequirement> TechnologyRequirements { get; set; }
     public DbSet<TechnologyType> TechnologyTypes { get; set; }
     public DbSet<JobExperience> JobExperiences { get; set; }
     public DbSet<Company> Companies { get; set; }
@@ -39,6 +40,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     IQueryable<Company> IApplicationDbContext.Companies => Companies.AsQueryable();
     IQueryable<Candidate> IApplicationDbContext.Candidates => Candidates.AsQueryable();
     IQueryable<TechnologyType> IApplicationDbContext.TechnologyTypes => TechnologyTypes.AsQueryable();
+    IQueryable<TechnologyRequirement> IApplicationDbContext.TechnologyRequirements => TechnologyRequirements.AsQueryable();
+
 
     public async Task<int> SaveChangesAsync()
     {
