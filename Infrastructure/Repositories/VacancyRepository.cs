@@ -179,7 +179,6 @@ public class VacancyRepository(IApplicationDbContext dbContext) : IVacancyReposi
             };
 
             dbContext.JobExperienceRequirements.Add(existing);
-            await dbContext.SaveChangesAsync();
         }
 
         await UpdateTechnologiesAsync(
@@ -197,7 +196,7 @@ public class VacancyRepository(IApplicationDbContext dbContext) : IVacancyReposi
 
         foreach (var existingItem in existingTechnologies)
         {
-            var incomingItem = incomingTechnologies.FirstOrDefault(i => i.Id == existingItem.Id);
+            var incomingItem = incomingTechnologies.FirstOrDefault(i => i.Id == existingItem.Id && i.JobExperienceRequirementId == existingItem.JobExperienceId);
             if (incomingItem == null) continue;
 
             existingItem.TechnologyType = incomingItem.TechnologyType;
