@@ -113,6 +113,7 @@ public class VacancyRepository(ApplicationDbContext dbContext) : IVacancyReposit
         existing.Responsibilities = incoming.Responsibilities;
         existing.AddDate = incoming.AddDate;
         existing.EndDate = incoming.EndDate;
+        existing.Salary = incoming.Salary;
     }
 
     private void UpdateLanguageLevels(
