@@ -1,11 +1,12 @@
+using Application.Interfaces;
 using Domain.Models;
+using Infrastructure.Data;
 using Infrastructure.Exceptions;
-using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class ResumeRepository(IApplicationDbContext dbContext) : IResumeRepository
+public class ResumeRepository(ApplicationDbContext dbContext) : IResumeRepository
 {
     public async Task<ICollection<Resume>> GetAllResumesByVacancyId(int vacancyId)
     {

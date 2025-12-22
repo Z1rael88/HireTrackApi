@@ -1,11 +1,10 @@
 using Domain.Enums;
 using Domain.Models;
-using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data.Seeders;
 
-public class ResumeSeeder(IApplicationDbContext db)
+public class ResumeSeeder(ApplicationDbContext db)
 {
     public async Task SeedAsync()
     {

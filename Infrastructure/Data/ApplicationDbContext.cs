@@ -1,6 +1,6 @@
+using Application.Interfaces;
 using Domain.Models;
 using Infrastructure.Data.Configurations;
-using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +25,21 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<EducationRequirement> EducationRequirements { get; set; }
     public DbSet<JobExperienceRequirement> JobExperienceRequirements { get; set; }
     public DbSet<VacancyResume> VacancyResumes { get; set; }
+    IQueryable<Vacancy> IApplicationDbContext.Vacancies => Vacancies.AsQueryable();
+    IQueryable<Resume> IApplicationDbContext.Resumes => Resumes.AsQueryable();
+    IQueryable<Technology> IApplicationDbContext.Technologies => Technologies.AsQueryable();
+    IQueryable<VacancyResume> IApplicationDbContext.VacancyResumes => VacancyResumes.AsQueryable();
+    IQueryable<Statistics> IApplicationDbContext.Statistics => Statistics.AsQueryable();
+    IQueryable<JobExperience> IApplicationDbContext.JobExperiences => JobExperiences.AsQueryable();
+    IQueryable<EducationRequirement> IApplicationDbContext.EducationRequirements => EducationRequirements.AsQueryable();
+    IQueryable<Education> IApplicationDbContext.Educations => Educations.AsQueryable();
+    IQueryable<JobExperienceRequirement> IApplicationDbContext.JobExperienceRequirements => JobExperienceRequirements.AsQueryable();
+    IQueryable<LanguageLevelRequirement> IApplicationDbContext.LanguageLevelRequirements => LanguageLevelRequirements.AsQueryable();
+    IQueryable<LanguageLevel> IApplicationDbContext.LanguageLevels => LanguageLevels.AsQueryable();
+    IQueryable<Company> IApplicationDbContext.Companies => Companies.AsQueryable();
+    IQueryable<Candidate> IApplicationDbContext.Candidates => Candidates.AsQueryable();
+    IQueryable<TechnologyType> IApplicationDbContext.TechnologyTypes => TechnologyTypes.AsQueryable();
+
     public async Task<int> SaveChangesAsync()
     {
         return await base.SaveChangesAsync();

@@ -1,5 +1,4 @@
 using Application.Dtos.Vacancy;
-using Domain.Models;
 
 namespace Application.Interfaces;
 

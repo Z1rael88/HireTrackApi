@@ -1,4 +1,4 @@
-using Infrastructure.Interfaces;
+using Application.Interfaces;
 
 namespace Infrastructure.Data.Seeders;
 

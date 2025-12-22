@@ -1,8 +1,8 @@
+using Application.Interfaces;
 using Domain.Interfaces;
 using Domain.Models;
 using Infrastructure.Data;
 using Infrastructure.Exceptions;
-using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
@@ -71,6 +71,7 @@ namespace Infrastructure.Repositories
                 Role = role,
                 User = user,
                 CompanyId = user.CompanyId ?? null,
+                Age = user.Age
             };
         }
 

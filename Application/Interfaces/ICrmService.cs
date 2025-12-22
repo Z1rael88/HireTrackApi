@@ -1,5 +1,4 @@
 using Application.Dtos.Resume.Technology;
-using Domain.Models;
 
 namespace Application.Interfaces;
 

@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Application.Interfaces;
 using Domain.Enums;
 using Domain.Models;
 using Infrastructure.Interfaces;

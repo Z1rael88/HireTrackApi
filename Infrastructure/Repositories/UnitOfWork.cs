@@ -1,6 +1,6 @@
+using Application.Interfaces;
 using Domain.Interfaces;
 using Infrastructure.Data;
-using Infrastructure.Interfaces;
 
 namespace Infrastructure.Repositories
 {

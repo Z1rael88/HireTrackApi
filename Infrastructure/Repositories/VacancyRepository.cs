@@ -1,12 +1,13 @@
+using Application.Interfaces;
 using Domain.Enums;
 using Domain.Models;
+using Infrastructure.Data;
 using Infrastructure.Exceptions;
-using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class VacancyRepository(IApplicationDbContext dbContext) : IVacancyRepository
+public class VacancyRepository(ApplicationDbContext dbContext) : IVacancyRepository
 {
     public async Task<IEnumerable<Vacancy>> GetAllVacanciesByCompanyIdAsync(int companyId)
     {

@@ -1,12 +1,11 @@
 using Domain.Enums;
 using Domain.Models;
-using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data.Seeders;
 
-public class VacancySeeder(IApplicationDbContext db, UserManager<User> userManager)
+public class VacancySeeder(ApplicationDbContext db, UserManager<User> userManager)
 {
     public async Task SeedAsync()
     {

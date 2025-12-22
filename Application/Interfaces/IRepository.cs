@@ -1,7 +1,7 @@
 using Domain.Interfaces;
 using Domain.Models;
 
-namespace Infrastructure.Interfaces
+namespace Application.Interfaces
 {
     public interface IRepository<T>
         where T : class, IBaseEntity

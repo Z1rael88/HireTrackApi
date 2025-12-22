@@ -1,10 +1,11 @@
+using Application.Interfaces;
 using Domain.Models;
-using Infrastructure.Interfaces;
+using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class StatisticsRepository(IApplicationDbContext dbContext) : IStatisticsRepository
+public class StatisticsRepository(ApplicationDbContext dbContext) : IStatisticsRepository
 {
     public async Task<IEnumerable<Statistics>> GetAllStatisticsByVacancyId(int vacancyId)
     {

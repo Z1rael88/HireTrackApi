@@ -1,10 +1,11 @@
+using Application.Interfaces;
 using Domain.Models;
-using Infrastructure.Interfaces;
+using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class CandidateRepository(IApplicationDbContext dbContext) : ICandidateRepository
+public class CandidateRepository(ApplicationDbContext dbContext) : ICandidateRepository
 {
     public async Task<Candidate?> GetCandidateByEmailAsync(string email)
     {
