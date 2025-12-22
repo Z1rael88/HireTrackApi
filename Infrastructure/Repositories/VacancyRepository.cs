@@ -192,12 +192,12 @@ public class VacancyRepository(ApplicationDbContext dbContext) : IVacancyReposit
         List<TechnologyRequirement> incomingTechnologies)
     {
         var existingTechnologies = await dbContext.Technologies
-            .Where(t => t.JobExperienceId == existingJob.Id)
+            .Where(t => t.JobExperienceRequirementId == existingJob.Id)
             .ToListAsync();
 
         foreach (var existingItem in existingTechnologies)
         {
-            var incomingItem = incomingTechnologies.FirstOrDefault(i => i.Id == existingItem.Id && i.JobExperienceRequirementId == existingItem.JobExperienceId);
+            var incomingItem = incomingTechnologies.FirstOrDefault(i => i.Id == existingItem.Id && i.JobExperienceRequirementId == existingItem.JobExperienceRequirementId);
             if (incomingItem == null) continue;
 
             existingItem.TechnologyType = incomingItem.TechnologyType;
@@ -209,7 +209,7 @@ public class VacancyRepository(ApplicationDbContext dbContext) : IVacancyReposit
             .Where(i => i.Id == 0)
             .Select(i => new Technology
             {
-                JobExperienceId = existingJob.Id,
+                JobExperienceRequirementId = existingJob.Id,
                 TechnologyType = i.TechnologyType,
                 TechnologyTypeId = i.TechnologyTypeId,
                 YearsOfExperience = i.YearsOfExperience

@@ -15,5 +15,8 @@ public class JobExperienceConfiguration : BaseEntityConfiguration<JobExperience>
         builder.HasMany(x => x.Technologies)
             .WithOne()
             .HasForeignKey(x => x.JobExperienceId);
+        builder.HasMany(x => x.Technologies)
+            .WithOne()
+            .HasForeignKey(x => x.JobExperienceRequirementId);
     }
 }
