@@ -3,7 +3,6 @@ using Application.Interfaces;
 using Domain.Enums;
 using Domain.Models;
 using Infrastructure.Exceptions;
-using Infrastructure.Interfaces;
 using Mapster;
 using LanguageLevel = Domain.Models.LanguageLevel;
 using StatisticsSummary = Domain.Models.StatisticsSummary;
@@ -55,6 +54,12 @@ public class StatisticsService(IUnitOfWork unitOfWork) : IStatisticsService
         return statisticsResult.Adapt<StatisticsResponseDto>();
     }
 
+    public async Task<StatisticsResponseDto> GetStatisticsByResumeIdAsync(int resumeId)
+    {
+        var result = await _statisticsRepository.GetStatisticsByResumeIdAsync(resumeId);
+        return result.Adapt<StatisticsResponseDto>();
+    }
+
     public async Task<StatisticsResponseDto> GetStatisticsByIdAsync(int statisticsId)
     {
         var statistics = await _statisticsCommonRepository.GetByIdAsync(statisticsId);
@@ -63,7 +68,7 @@ public class StatisticsService(IUnitOfWork unitOfWork) : IStatisticsService
 
     public async Task<IEnumerable<StatisticsResponseDto>> GetAllStatisticsByVacancyIdAsync(int vacancyId)
     {
-        var statistics = await _statisticsRepository.GetAllStatisticsByVacancyId(vacancyId);
+        var statistics = await _statisticsRepository.GetAllStatisticsByVacancyIdAsync(vacancyId);
         return statistics.Adapt<IEnumerable<StatisticsResponseDto>>();
     }
 

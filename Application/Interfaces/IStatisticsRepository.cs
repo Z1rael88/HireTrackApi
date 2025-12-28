@@ -4,5 +4,6 @@ namespace Application.Interfaces;
 
 public interface IStatisticsRepository
 {
-    Task<IEnumerable<Statistics>> GetAllStatisticsByVacancyId(int vacancyId);
+    Task<IEnumerable<Statistics>> GetAllStatisticsByVacancyIdAsync(int vacancyId);
+    Task<Statistics> GetStatisticsByResumeIdAsync(int resumeId);
 }

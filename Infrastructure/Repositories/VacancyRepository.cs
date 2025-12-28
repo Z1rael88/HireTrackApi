@@ -114,6 +114,8 @@ public class VacancyRepository(ApplicationDbContext dbContext) : IVacancyReposit
         existing.AddDate = incoming.AddDate;
         existing.EndDate = incoming.EndDate;
         existing.Salary = incoming.Salary;
+        existing.Address.City = incoming.Address.City;
+        existing.Address.Country = incoming.Address.Country;
     }
 
     private void UpdateLanguageLevels(

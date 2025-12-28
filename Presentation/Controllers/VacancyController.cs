@@ -1,7 +1,6 @@
 using Application.Dtos.Vacancy;
 using Application.Interfaces;
 using Domain.Enums;
-using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

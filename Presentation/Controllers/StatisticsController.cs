@@ -23,4 +23,11 @@ public class StatisticsController(IStatisticsService statisticsService) : Contro
         var result = await statisticsService.GetAllStatisticsByVacancyIdAsync(vacancyId);
         return Ok(result);
     }
+    [Authorize(Roles = nameof(Role.HrManager))]
+    [HttpGet("getStatisticsBy/{resumeId}")]
+    public async Task<IActionResult> GetStatisticsForResume(int resumeId)
+    {
+        var result = await statisticsService.GetStatisticsByResumeIdAsync(resumeId);
+        return Ok(result);
+    }
 }

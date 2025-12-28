@@ -5,8 +5,7 @@ namespace Application.Interfaces;
 public interface IStatisticsService
 {
     Task<StatisticsResponseDto> GenerateStatisticsForResumeAsync(int vacancyId, int resumeId);
-    Task<StatisticsResponseDto> GetStatisticsByIdAsync(int statisticsId);
-    
+    Task<StatisticsResponseDto> GetStatisticsByResumeIdAsync(int resumeId);
     Task<IEnumerable<StatisticsResponseDto>> GetAllStatisticsByVacancyIdAsync(int vacancyId);
 
 }
