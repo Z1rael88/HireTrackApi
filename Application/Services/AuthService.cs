@@ -8,7 +8,6 @@ using Domain.Enums;
 using Domain.Models;
 using FluentValidation;
 using Infrastructure.Exceptions;
-using Infrastructure.Interfaces;
 using Infrastructure.ValidationOptions;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
@@ -17,13 +16,15 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Application.Services;
 
-public class AuthService(UserManager<User> userManager, IOptions<JwtOptions> jwtOptions, IUnitOfWork unitOfWork,RoleManager<IdentityRole<int>> roleManager,IValidator<BaseUserDto> validator)
+public class AuthService(
+    UserManager<User> userManager,
+    IOptions<JwtOptions> jwtOptions,
+    ICandidateRepository candidateRepository,
+    IRepository<User> userRepository,
+    RoleManager<IdentityRole<int>> roleManager,
+    IValidator<BaseUserDto> validator)
     : IAuthService
 {
-    private readonly IRepository<User> _userRepository = unitOfWork.Repository<User>();
-    private readonly ICandidateRepository _candidateRepository = unitOfWork.Candidates;
-    private readonly IRepository<Candidate> _candidateDefaultRepository = unitOfWork.Repository<Candidate>();
-
     public async Task<LoginResponseDto> Login(LoginUserDto dto)
     {
         var user = await userManager.FindByEmailAsync(dto.Email);
@@ -42,7 +43,7 @@ public class AuthService(UserManager<User> userManager, IOptions<JwtOptions> jwt
         var role = await GetRoleByUserAsync(user);
         var accessToken = GenerateAccessToken(userId, role);
         var refreshToken = GenerateRefreshToken(userId);
-        var userProfileWithRole = await _userRepository.GetUserWithRoleById(userId);
+        var userProfileWithRole = await userRepository.GetUserWithRoleById(userId);
         var result = new LoginResponseDto()
         {
             UserResponseDto = userProfileWithRole.Adapt<UserResponseDto>(),
@@ -75,11 +76,11 @@ public class AuthService(UserManager<User> userManager, IOptions<JwtOptions> jwt
             throw new SecurityTokenException("Invalid user profile ID format");
         }
 
-        var user = await _userRepository.GetByIdAsync(userId);
+        var user = await userRepository.GetByIdAsync(userId);
         var role = await GetRoleByUserAsync(user);
         var newAccessToken = GenerateAccessToken(userId, role);
         var newRefreshToken = GenerateRefreshToken(userId);
-        var userProfileWithRole = await _userRepository.GetUserWithRoleById(user.Id);
+        var userProfileWithRole = await userRepository.GetUserWithRoleById(user.Id);
         var result = new LoginResponseDto()
         {
             UserResponseDto = userProfileWithRole.Adapt<UserResponseDto>(),
@@ -95,18 +96,20 @@ public class AuthService(UserManager<User> userManager, IOptions<JwtOptions> jwt
         var user = dto.Adapt<User>();
         var roleName = dto.Role.ToString();
         await ValidateRoleAsync(dto.Role);
-        await CreateUserAndAssignRoleAsync(user, dto.Password,roleName );
+        await CreateUserAndAssignRoleAsync(user, dto.Password, roleName);
         var resultDto = user.Adapt<UserResponseDto>();
         resultDto.Role = dto.Role;
-        
-        var candidate = await _candidateRepository.GetCandidateByEmailAsync(user.Email!);
+
+        var candidate = await candidateRepository.GetCandidateByEmailAsync(user.Email!);
         if (candidate is not null)
         {
             candidate.UserId = user.Id;
-            await _candidateDefaultRepository.SaveChangesAsync();
+            await candidateRepository.SaveChangesAsync();
         }
+
         return resultDto;
     }
+
     private async Task ValidateRoleAsync(Role role)
     {
         if (!await roleManager.RoleExistsAsync(role.ToString()) && role == Role.SystemAdministrator)
@@ -123,6 +126,7 @@ public class AuthService(UserManager<User> userManager, IOptions<JwtOptions> jwt
         {
             throw new IdentityException("User creation failed", userCreationResult.Errors);
         }
+
         var roleAssignmentResult = await userManager.AddToRoleAsync(user, roleName);
         if (!roleAssignmentResult.Succeeded)
         {

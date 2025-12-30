@@ -9,17 +9,13 @@ using Mapster;
 
 namespace Application.Services;
 
-public class UserService(IUnitOfWork unitOfWork) : IUserService
+public class UserService(IRepository<User> userRepository, IRepository<Company> companyRepository,IRepository<Candidate> candidateRepository) : IUserService
 {
-    private IRepository<User> _userRepository = unitOfWork.Repository<User>();
-    private IRepository<Company> _companyRepository = unitOfWork.Repository<Company>();
-    private IRepository<Candidate> _candidateRepository = unitOfWork.Repository<Candidate>();
-
     public async Task<UserWithCompanyResponseDto> GetUserProfileById(int userId)
     {
         var result = new UserWithCompanyResponseDto();
 
-        var userWithRole = await _userRepository.GetUserWithRoleById(userId);
+        var userWithRole = await userRepository.GetUserWithRoleById(userId);
         result.Firstname = userWithRole.User.Firstname;
         result.Lastname = userWithRole.User.Lastname;
         result.Username = userWithRole.User.UserName;
@@ -30,7 +26,7 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
         if (userWithRole.CompanyId is null)
             return result;
 
-        var company = await _companyRepository.GetByIdAsync((int)userWithRole.CompanyId); 
+        var company = await companyRepository.GetByIdAsync((int)userWithRole.CompanyId); 
 
         result.CompanyId = company.Id;
         result.CompanyName = company.Name;
@@ -42,7 +38,7 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
 
     public async Task<UserWithCompanyResponseDto> GetUserByCandidateId(int candidateId)
     {
-        var candidate = await _candidateRepository.GetByIdAsync(candidateId);
+        var candidate = await candidateRepository.GetByIdAsync(candidateId);
         if (candidate.UserId is null)
         {
             throw new NotFoundException("There's no candidate or user id for candidate is null");

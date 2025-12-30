@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class CandidateRepository(ApplicationDbContext dbContext) : ICandidateRepository
+public class CandidateRepository(ApplicationDbContext dbContext) : Repository<Candidate>(dbContext), ICandidateRepository
 {
     public async Task<Candidate?> GetCandidateByEmailAsync(string email)
     {

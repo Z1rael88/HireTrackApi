@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class ResumeRepository(ApplicationDbContext dbContext) : IResumeRepository
+public class ResumeRepository(ApplicationDbContext dbContext) : Repository<Resume>(dbContext), IResumeRepository
 {
     public async Task<ICollection<Resume>> GetAllResumesByVacancyId(int vacancyId)
     {
@@ -92,7 +92,7 @@ public class ResumeRepository(ApplicationDbContext dbContext) : IResumeRepositor
 
         UpdateLanguageLevels(existingLanguageLevels, resume.LanguageLevels.ToList(), resumeId);
         UpdateEducations(existingEducations, resume.Educations.ToList(), resumeId);
-        await UpdateJobExperiencesAsync(existingJobExperiences, resume.JobExperiences.ToList(),resumeId);
+        await UpdateJobExperiencesAsync(existingJobExperiences, resume.JobExperiences.ToList(), resumeId);
 
         await dbContext.SaveChangesAsync();
     }
@@ -175,7 +175,8 @@ public class ResumeRepository(ApplicationDbContext dbContext) : IResumeRepositor
         dbContext.Educations.RemoveRange(toRemove);
     }
 
-    private async Task UpdateJobExperiencesAsync(List<JobExperience> existing, List<JobExperience> incoming,int resumeId)
+    private async Task UpdateJobExperiencesAsync(List<JobExperience> existing, List<JobExperience> incoming,
+        int resumeId)
     {
         var toUpdate = existing.Where(e => incoming.Any(i => i.Id == e.Id)).ToList();
         foreach (var existingItem in toUpdate)

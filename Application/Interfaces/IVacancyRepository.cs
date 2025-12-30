@@ -3,10 +3,10 @@ using Domain.Models;
 
 namespace Application.Interfaces;
 
-public interface IVacancyRepository 
+public interface IVacancyRepository : IRepository<Vacancy>
 {
     Task<IEnumerable<Vacancy>> GetAllVacanciesByCompanyIdAsync(int companyId);
-    Task<Vacancy> GetByIdAsync(int vacancyId);
+    Task<Vacancy> GetByIdIncludedAsync(int vacancyId);
     Task<IEnumerable<Vacancy>> GetAllVacanciesByIdsAsync(List<int> vacancyIds);
     Task<ResumeStatus> GetResumeStatusByResumeIdAsync(int resumeId);
     Task<IEnumerable<Vacancy>>  GetByHrIdAsync(int hrId);

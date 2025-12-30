@@ -9,17 +9,15 @@ using StatisticsSummary = Domain.Models.StatisticsSummary;
 
 namespace Application.Services;
 
-public class StatisticsService(IUnitOfWork unitOfWork) : IStatisticsService
+public class StatisticsService(
+    IStatisticsRepository statisticsRepository,
+    IVacancyRepository vacancyRepository,
+    IResumeRepository resumeRepository) : IStatisticsService
 {
-    private IVacancyRepository _vacancyRepository = unitOfWork.Vacancies;
-    private IResumeRepository _resumeRepository = unitOfWork.Resumes;
-    private IStatisticsRepository _statisticsRepository = unitOfWork.Statistics;
-    private IRepository<Statistics> _statisticsCommonRepository = unitOfWork.Repository<Statistics>();
-
     public async Task<StatisticsResponseDto> GenerateStatisticsForResumeAsync(int vacancyId, int resumeId)
     {
-        var resume = await _resumeRepository.GetResumeById(resumeId);
-        var vacancy = await _vacancyRepository.GetByIdAsync(vacancyId);
+        var resume = await resumeRepository.GetResumeById(resumeId);
+        var vacancy = await vacancyRepository.GetByIdIncludedAsync(vacancyId);
 
         if (resume is null || vacancy is null)
         {
@@ -30,7 +28,7 @@ public class StatisticsService(IUnitOfWork unitOfWork) : IStatisticsService
         statisticsResult.VacancyId = vacancyId;
         statisticsResult.ResumeId = resumeId;
 
-        var education = resume.Educations.FirstOrDefault(); 
+        var education = resume.Educations.FirstOrDefault();
         var educationStatistics = CalculateEducationStatistics(vacancy.EducationsRequirement, education);
         statisticsResult.EducationMatchPercent = educationStatistics.EducationMatchPercent;
         statisticsResult.EducationSummary = educationStatistics.EducationSummary;
@@ -46,34 +44,36 @@ public class StatisticsService(IUnitOfWork unitOfWork) : IStatisticsService
         statisticsResult.ExperienceMatchPercent = experienceStatistics.ExperienceMatchPercent;
 
         var totalStatistics =
-            CalculateTotalStatistics(experienceStatistics, languageLevelStatistics, educationStatistics, vacancy,resume);
+            CalculateTotalStatistics(experienceStatistics, languageLevelStatistics, educationStatistics, vacancy,
+                resume);
         statisticsResult.Summary = totalStatistics.SummaryDto.Adapt<StatisticsSummary>();
         statisticsResult.TotalMatchPercent = totalStatistics.TotalMatchPercent;
-        
-        var createdStatistics = await _statisticsCommonRepository.CreateAsync(statisticsResult);
+
+        var createdStatistics = await statisticsRepository.CreateAsync(statisticsResult);
         return statisticsResult.Adapt<StatisticsResponseDto>();
     }
 
     public async Task<StatisticsResponseDto> GetStatisticsByResumeIdAsync(int resumeId)
     {
-        var result = await _statisticsRepository.GetStatisticsByResumeIdAsync(resumeId);
+        var result = await statisticsRepository.GetStatisticsByResumeIdAsync(resumeId);
         return result.Adapt<StatisticsResponseDto>();
     }
 
     public async Task<StatisticsResponseDto> GetStatisticsByIdAsync(int statisticsId)
     {
-        var statistics = await _statisticsCommonRepository.GetByIdAsync(statisticsId);
+        var statistics = await statisticsRepository.GetByIdAsync(statisticsId);
         return statistics.Adapt<StatisticsResponseDto>();
     }
 
     public async Task<IEnumerable<StatisticsResponseDto>> GetAllStatisticsByVacancyIdAsync(int vacancyId)
     {
-        var statistics = await _statisticsRepository.GetAllStatisticsByVacancyIdAsync(vacancyId);
+        var statistics = await statisticsRepository.GetAllStatisticsByVacancyIdAsync(vacancyId);
         return statistics.Adapt<IEnumerable<StatisticsResponseDto>>();
     }
 
     private TotalStatistics CalculateTotalStatistics(ExperienceStatistics experienceStatistics,
-        LanguageLevelStatistics languageLevelStatistics, EducationStatistics educationStatistics,Vacancy vacancy, Resume resume)
+        LanguageLevelStatistics languageLevelStatistics, EducationStatistics educationStatistics, Vacancy vacancy,
+        Resume resume)
     {
         var result = new TotalStatistics();
         var workTypeMatches = resume.Candidate.WorkType
@@ -138,6 +138,7 @@ public class StatisticsService(IUnitOfWork unitOfWork) : IStatisticsService
             ExperienceSummary = "Aggregated experience across multiple roles."
         };
     }
+
     private ExperienceStatistics CalculateSingleJobExperience(
         JobExperienceRequirement requirement,
         JobExperience experience)

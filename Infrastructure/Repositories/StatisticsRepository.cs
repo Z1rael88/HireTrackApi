@@ -6,12 +6,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class StatisticsRepository(ApplicationDbContext dbContext) : IStatisticsRepository
+public class StatisticsRepository(ApplicationDbContext dbContext)
+    : Repository<Statistics>(dbContext), IStatisticsRepository
 {
     public async Task<IEnumerable<Statistics>> GetAllStatisticsByVacancyIdAsync(int vacancyId)
     {
         return await dbContext.Statistics.Where(x => x.VacancyId == vacancyId).ToListAsync();
     }
+
     public async Task<Statistics> GetStatisticsByResumeIdAsync(int resumeId)
     {
         var result = await dbContext.Statistics.FirstOrDefaultAsync(x => x.ResumeId == resumeId);

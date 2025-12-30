@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class VacancyRepository(ApplicationDbContext dbContext) : IVacancyRepository
+public class VacancyRepository(ApplicationDbContext dbContext) : Repository<Vacancy>(dbContext), IVacancyRepository
 {
     public async Task<IEnumerable<Vacancy>> GetAllVacanciesByCompanyIdAsync(int companyId)
     {
@@ -19,7 +19,7 @@ public class VacancyRepository(ApplicationDbContext dbContext) : IVacancyReposit
             .Include(x => x.LanguageLevelRequirements).ToListAsync();
     }
 
-    public async Task<Vacancy> GetByIdAsync(int vacancyId)
+    public async Task<Vacancy> GetByIdIncludedAsync(int vacancyId)
     {
         var result = await dbContext.Vacancies
             .Where(x => x.Id == vacancyId)

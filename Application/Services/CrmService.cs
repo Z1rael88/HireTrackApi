@@ -6,19 +6,18 @@ using Mapster;
 
 namespace Application.Services;
 
-public class CrmService(IUnitOfWork unitOfWork) : ICrmService
+public class CrmService(IRepository<TechnologyType> technologyTypeRepository) : ICrmService
 {
-    private readonly IRepository<TechnologyType> _repository = unitOfWork.Repository<TechnologyType>();
     public async Task<TechnologyTypeResponseDto> CreateTechnologyType(TechnologyTypeRequestDto dto)
     {
         var technologyType = dto.Adapt<TechnologyType>();
-        var createdTechnologyType = await _repository.CreateAsync(technologyType);
+        var createdTechnologyType = await technologyTypeRepository.CreateAsync(technologyType);
         return createdTechnologyType.Adapt<TechnologyTypeResponseDto>();
     }
 
     public async Task<IEnumerable<TechnologyTypeResponseDto>> GetAllTechnologyTypes()
     {
-        var technologyTypes = await _repository.GetAllAsync();
+        var technologyTypes = await technologyTypeRepository.GetAllAsync();
         return technologyTypes.Adapt<IEnumerable<TechnologyTypeResponseDto>>();
     }
 }

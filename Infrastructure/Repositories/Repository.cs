@@ -20,11 +20,6 @@ namespace Infrastructure.Repositories
             return newEntity.Entity;
         }
 
-        public IQueryable<T> Query()
-        {
-            return dbContext.Set<T>().AsQueryable();
-        }
-
         public async Task<T> UpdateAsync(T entity)
         {
             var updatedEntity = Entities.Update(entity);
@@ -96,6 +91,10 @@ namespace Infrastructure.Repositories
                     r => r.Id,
                     (ur, r) => r.Name)
                 .SingleOrDefaultAsync();
+        }
+        public IQueryable<T> Query()
+        {
+            return dbContext.Set<T>().AsQueryable();
         }
     }
 }

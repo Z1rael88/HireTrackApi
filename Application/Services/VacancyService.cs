@@ -12,53 +12,42 @@ using Microsoft.AspNetCore.Identity;
 namespace Application.Services;
 
 public class VacancyService(
-    IUnitOfWork unitOfWork,
+    IVacancyRepository vacancyRepository,
+    IResumeRepository resumeRepository,
     IValidator<VacancyRequestDto> validator,
     IUser user,
     UserManager<User> userManager) : IVacancyService
 {
-    private readonly IRepository<Vacancy> _repository = unitOfWork.Repository<Vacancy>();
-    private readonly IVacancyRepository _vacancyRepository = unitOfWork.Vacancies;
-    private readonly IResumeRepository _resumeRepository = unitOfWork.Resumes;
-
     public async Task<VacancyResponseDto> CreateVacancyAsync(VacancyRequestDto vacancyRequestDto)
     {
         validator.ValidateAndThrow(vacancyRequestDto);
         var mappedVacancy = vacancyRequestDto.Adapt<Vacancy>();
         mappedVacancy.HrId = user.Id;
-        var createdVacancy = await _repository.CreateAsync(mappedVacancy);
-        return createdVacancy.Adapt<VacancyResponseDto>();
-    }
-
-    public async Task<VacancyResponseDto> UpdateVacancyAsync(VacancyRequestDto updateVacancyRequestDto)
-    {
-        validator.ValidateAndThrow(updateVacancyRequestDto);
-        var mappedVacancy = updateVacancyRequestDto.Adapt<Vacancy>();
-        var createdVacancy = await _repository.UpdateAsync(mappedVacancy);
+        var createdVacancy = await vacancyRepository.CreateAsync(mappedVacancy);
         return createdVacancy.Adapt<VacancyResponseDto>();
     }
 
     public async Task<VacancyResponseDto> GetVacancyByIdAsync(int vacancyId)
     {
-        var vacancy = await _vacancyRepository.GetByIdAsync(vacancyId);
+        var vacancy = await vacancyRepository.GetByIdIncludedAsync(vacancyId);
         return vacancy.Adapt<VacancyResponseDto>();
     }
 
     public async Task<IEnumerable<VacancyResponseDto>> GetVacanciesAsync()
     {
-        var vacancies = await _repository.GetAllAsync();
+        var vacancies = await vacancyRepository.GetAllAsync();
         return vacancies.Adapt<IEnumerable<VacancyResponseDto>>();
     }
 
     public async Task<IEnumerable<VacancyResponseDto>> GetAllVacanciesByCompanyIdAsync(int companyId)
     {
-        var vacancies = await _vacancyRepository.GetAllVacanciesByCompanyIdAsync(companyId);
+        var vacancies = await vacancyRepository.GetAllVacanciesByCompanyIdAsync(companyId);
         return vacancies.Adapt<IEnumerable<VacancyResponseDto>>();
     }
 
     public async Task DeleteVacancyAsync(int vacancyId)
     {
-        await _repository.DeleteAsync(vacancyId);
+        await vacancyRepository.DeleteAsync(vacancyId);
     }
 
     public async Task<IEnumerable<VacancyWithStatusDto>?> GetVacanciesByUserIdAsync(int userId)
@@ -66,12 +55,12 @@ public class VacancyService(
         var user = await userManager.FindByIdAsync(userId.ToString())
                    ?? throw new NotFoundException("User with such id not found");
 
-        var resume = await _resumeRepository.GetResumeByCandidateEmail(user.Email!);
+        var resume = await resumeRepository.GetResumeByCandidateEmail(user.Email!);
         if (resume is null)
         {
             throw new NotFoundException("Resume for user with that email is not found");
         }
-        var vacancyResumes = await _resumeRepository.GetAllVacancyResumesByResumeIdAsync(resume.Id);
+        var vacancyResumes = await resumeRepository.GetAllVacancyResumesByResumeIdAsync(resume.Id);
         if (vacancyResumes is null)
         {
             return null;
@@ -106,12 +95,12 @@ public class VacancyService(
 
     public async Task<IEnumerable<VacancyResponseDto>> GetByHrIdAsync(int hrId)
     {
-        var vacancy = await _vacancyRepository.GetByHrIdAsync(hrId);
+        var vacancy = await vacancyRepository.GetByHrIdAsync(hrId);
         return vacancy.Adapt<IEnumerable<VacancyResponseDto>>();
     }
 
     public async Task UpdateVacancyAsync(VacancyRequestDto vacancy, int vacancyId)
     {
-        await _vacancyRepository.UpdateVacancyAsync(vacancy.Adapt<Vacancy>(), vacancyId);
+        await vacancyRepository.UpdateVacancyAsync(vacancy.Adapt<Vacancy>(), vacancyId);
     }
 }

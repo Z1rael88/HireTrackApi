@@ -2,7 +2,7 @@ using Domain.Models;
 
 namespace Application.Interfaces;
 
-public interface IResumeRepository
+public interface IResumeRepository : IRepository<Resume>
 {
     Task<ICollection<Resume>> GetAllResumesByVacancyId(int vacancyId);
     Task<Resume> GetResumeById(int resumeId);

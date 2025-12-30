@@ -2,7 +2,6 @@ using System.Security.Claims;
 using Application.Interfaces;
 using Domain.Enums;
 using Domain.Models;
-using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -20,9 +19,6 @@ namespace Application.Initializers
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
             var httpContextAccessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
-            var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-            var userRepository = unitOfWork.Repository<User>();
-
             var email = config["Logging:SystemAdminSettings:Email"]!;
             var userName = config["Logging:SystemAdminSettings:UserName"]!;
             var password = config["Logging:SystemAdminSettings:Password"]!;
