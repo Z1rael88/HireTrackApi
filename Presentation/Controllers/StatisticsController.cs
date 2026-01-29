@@ -9,7 +9,6 @@ namespace Presentation.Controllers;
 [Route("statistics/")]
 public class StatisticsController(IStatisticsService statisticsService) : ControllerBase
 {
-    [Authorize(Roles = nameof(Role.HrManager))]
     [HttpPost("generateStatisticsBy/{resumeId}")]
     public async Task<IActionResult> GenerateStatisticsForResume(int vacancyId, int resumeId)
     {

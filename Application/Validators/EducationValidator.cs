@@ -20,9 +20,6 @@ namespace Application.Validators
             RuleFor(u => u.StartDate)
                 .NotEmpty()
                 .WithMessage("Start date is required");
-            RuleFor(u => u.EndDate)
-                .NotEmpty()
-                .WithMessage("Add date is required");
         }
     }
 }

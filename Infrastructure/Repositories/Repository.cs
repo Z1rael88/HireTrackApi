@@ -48,10 +48,6 @@ namespace Infrastructure.Repositories
         public async Task DeleteAsync(int id)
         {
             var entity = await GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new ArgumentException();
-            }
 
             dbContext.Remove(entity);
             await dbContext.SaveChangesAsync();

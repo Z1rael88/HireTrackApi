@@ -135,7 +135,9 @@ public class StatisticsService(
         return new ExperienceStatistics
         {
             ExperienceMatchPercent = results.Average(r => r.ExperienceMatchPercent),
-            ExperienceSummary = "Aggregated experience across multiple roles."
+            ExperienceSummary = string.Join(
+                ", ",
+                results.Select(x => x.ExperienceSummary))
         };
     }
 

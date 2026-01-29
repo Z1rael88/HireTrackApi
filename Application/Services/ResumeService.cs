@@ -78,8 +78,8 @@ public class ResumeService( IResumeRepository resumeRepository, ICandidateReposi
 
         foreach (var dto in result)
         {
-            dto.Status =
-                await vacancyRepository.GetResumeStatusByResumeIdAsync(dto.Id);
+            var vacancyResume = await resumeRepository.GetVacancyResumeByIds(vacancyId, dto.Id);
+            dto.Status = vacancyResume?.Status ?? ResumeStatus.Sent;
         }
 
         return result;
